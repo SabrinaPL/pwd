@@ -6,3 +6,4 @@
  */
 
 import './components/flipping-tile/index.js'
+import './components/memory-game/index.js'
