@@ -13,8 +13,8 @@ template.innerHTML = `
 
   <style>
     .flipping-tile {
-      width: 400px; 
-      height: 400px;
+      width: 300px; 
+      height: 300px;
       margin: 1rem; 
       border: 1px solid black;
       border-radius: 10px; 
