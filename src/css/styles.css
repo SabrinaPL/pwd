@@ -1,3 +1,9 @@
+@font-face { 
+	font-family: 'Dosis';
+	src: url('../fonts/Dosis/Dosis-VariableFont_wght.ttf'); 
+}
+
 body {
 	background: #ffffff;
+	font-family: 'Dosis', Arial, Helvetica, sans-serif;
 }

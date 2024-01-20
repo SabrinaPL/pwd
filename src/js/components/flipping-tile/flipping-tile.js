@@ -15,10 +15,12 @@ template.innerHTML = `
     .flipping-tile {
       width: 400px; 
       height: 400px;
+      margin: 1rem; 
       border: 1px solid black;
       border-radius: 10px; 
       padding: 10px; 
       transition: opacity 1s;
+      background-color: white; 
     }
 
     #wrapper { 
