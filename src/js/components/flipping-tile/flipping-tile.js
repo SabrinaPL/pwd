@@ -18,6 +18,7 @@ template.innerHTML = `
       border: 1px solid black;
       border-radius: 10px; 
       padding: 10px; 
+      transition: opacity 1s;
     }
 
     #wrapper { 
@@ -42,15 +43,15 @@ template.innerHTML = `
     }
 
     ::part(front-of-tile) { 
-      /* background-color: red; */
-      /* background-image: url('./images/front-of-card.png'); */
+      background-color: red;
+      background-image: url('./images/front-of-card.png');
     }
 
     ::part(back-of-tile) { 
-      /* background-color: #f5e9ee; */ 
+      background-color: #f5e9ee;
     
       /* The background image is added here now to test that it works, will later be randomly generated and added to the back of the tile via slot. */
-      /* background-image: url('./images/kanji1.png'); */
+      background-image: url('./images/kanji1.png');
 
       /* The back of the tile is rotated 180 degrees by default to hide it from the user. */
       transform: rotateY(180deg);
@@ -61,7 +62,7 @@ template.innerHTML = `
       transition: transform 1s; 
     }
 
-    .flipping-tile.is-in-focus {
+    .flipping-tile:hover {
       /* Opacity is used here to give the user a visual cue as to which card is currently selected (in focus with mouse hover). */
       opacity: 0.6; 
     }
@@ -106,14 +107,6 @@ customElements.define('flipping-tile',
         /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
         tile.classList.add('is-disabled')
       })
-
-      tile.addEventListener('mouseover', () => {
-        tile.classList.add('is-in-focus')
-      })
-
-      tile.addEventListener('mouseout', () => {
-        tile.classList.remove('is-in-focus')
-      })
     }
 
     /**
@@ -123,7 +116,5 @@ customElements.define('flipping-tile',
     disconnectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.removeEventListener('click')
-      tile.removeEventListener('mouseover')
-      tile.removeEventListener('mouseout')
     }
   })

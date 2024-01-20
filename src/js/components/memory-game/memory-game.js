@@ -4,10 +4,7 @@ const template = document.createElement('template')
 template.innerHTML = ` 
 <div class="memory-game">
     <div id="memory-game-board">
-        <flipping-tile>
-          <div part="front-of-tile" slot="front">Hello</div>
-          <div part="back-of-tile" slot="back">World</div>
-        </flipping-tile>
+      <flipping-tile></flipping-tile>
     </div>
 <div>
 
@@ -36,5 +33,10 @@ customElements.define('memory-game',
 
       this.attachShadow({ mode: 'open' })
       this.shadowRoot.appendChild(template.content.cloneNode(true))
+    }
+
+    connectedCallback () {
+      /* Plocka ut memory game ur shadow root, loopa igenom, createElement + addChild för flipping tiles, då kan dynamiskt rendera upp antalet tiles */
+      /* const flippingTile = this.shadowRoot.querySelector('flipping-tile') */
     }
   })
