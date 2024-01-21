@@ -6,8 +6,10 @@ template.innerHTML = `
     <h1>Kanji memory game</h1>
     <p>Try to find all matching pairs of kanji!</p>
 
+    <!-- I want to dynamically render this text and the radio buttons below, so that I can hide the radio buttons when the game is in progress. -->
     <p>Choose game difficulty to start the game:</p>
     <div class="difficulty-buttons">
+
       <!-- The data-columns and data-rows attributes are used to dynamically set the number of columns and rows in the memory game board. -->
       <input type="radio" id="easy" name="difficulty" value="easy" data-columns="2" data-rows="2">
       <label for="easy">Easy</label>
@@ -58,6 +60,10 @@ customElements.define('memory-game',
  */
   class extends HTMLElement {
     #memoryGameBoard
+    #difficultyBtns
+    #columns
+    #rows
+    #selectedTile
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -76,27 +82,51 @@ customElements.define('memory-game',
     connectedCallback () {
       this.#memoryGameBoard = this.shadowRoot.querySelector('#memory-game-board')
 
-      const difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
+      this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
 
       // Loop through the radio buttons and add event listeners that listen to when the user selects a radio button (so that the grid size can be rendered dynamically).
-      difficultyBtns.forEach(btn => {
+      this.#difficultyBtns.forEach(btn => {
         btn.addEventListener('change', () => {
-          const columns = btn.dataset.columns
-          const rows = btn.dataset.rows
-
-          // Clear the memory game board each time the user changes the difficulty level of the game.
-          this.#memoryGameBoard.innerHTML = ''
-
-          // Set the grid template columns and rows styling dynamically.
-          this.#memoryGameBoard.style.gridTemplateColumns = `repeat(${columns}, 1fr)`
-          this.#memoryGameBoard.style.gridTemplateRows = `repeat(${rows}, 1fr)`
-
-          // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
-          for (let i = 0; i < columns * rows; i++) {
-            const flippingTile = document.createElement('flipping-tile')
-            this.#memoryGameBoard.append(flippingTile)
-          }
+          this.#columns = btn.dataset.columns
+          this.#rows = btn.dataset.rows
+          this.#renderMemoryGameBoard()
         })
+      })
+    }
+
+    /**
+     * Method to render the memory game board.
+     *
+     */
+    #renderMemoryGameBoard () {
+      // Clear the memory game board each time the user changes the difficulty level of the game.
+      this.#memoryGameBoard.innerHTML = ''
+
+      // Set the grid template columns and rows styling dynamically.
+      this.#memoryGameBoard.style.gridTemplateColumns = `repeat(${this.#columns}, 1fr)`
+      this.#memoryGameBoard.style.gridTemplateRows = `repeat(${this.#rows}, 1fr)`
+
+      // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
+      for (let i = 0; i < this.#columns * this.#rows; i++) {
+        const flippingTile = document.createElement('flipping-tile')
+        this.#memoryGameBoard.append(flippingTile)
+      }
+    }
+
+    /**
+     * Method to check flipped cards, keep count of number of tries and number of remaining tiles.
+     *
+     */
+    #checkFlippedCards () {
+
+    }
+
+    /**
+     * Event listeners removed when component is disconnected from DOM.
+     */
+    disconnectedCallback () {
+      this.#difficultyBtns.forEach(btn => {
+        btn.removeEventListener('change', () => {})
       })
     }
   })

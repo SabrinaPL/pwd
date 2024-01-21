@@ -6,7 +6,6 @@ template.innerHTML = `
       <slot name="front"></slot>
     </div>
     <div part="back-of-tile">
-      <slot name="back"></slot>
     </div>
 </div>
   </div>
@@ -45,18 +44,14 @@ template.innerHTML = `
     }
 
     ::part(front-of-tile) { 
-      background-color: red;
-      background-image: url('./images/front-of-card.png');
+      background-color: #f5e9ee;
+  
+      /* The front of the tile is rotated 180 degrees by default to hide it from the user. */
+      transform: rotateY(180deg);
     }
 
     ::part(back-of-tile) { 
-      background-color: #f5e9ee;
-    
-      /* The background image is added here now to test that it works, will later be randomly generated and added to the back of the tile via slot. */
-      background-image: url('./images/kanji1.png');
-
-      /* The back of the tile is rotated 180 degrees by default to hide it from the user. */
-      transform: rotateY(180deg);
+      background-color: red;
     }
 
     .flipping-tile.is-flipped #wrapper {
@@ -103,12 +98,19 @@ customElements.define('flipping-tile',
      */
     connectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
-      tile.addEventListener('click', () => {
-        tile.classList.add('is-flipped')
+      tile.addEventListener('click', () => this.#flipTile(tile))
+    }
 
-        /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
-        tile.classList.add('is-disabled')
-      })
+    /**
+     * Method to flip and disable a tile.
+     *
+     * @param {HTMLElement} tile - The tile to be flipped and disabled.
+     */
+    #flipTile (tile) {
+      tile.classList.add('is-flipped')
+
+      /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
+      tile.classList.add('is-disabled')
     }
 
     /**
