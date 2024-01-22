@@ -7,13 +7,13 @@ template.innerHTML = `
     </div>
     <div part="back-of-tile">
     </div>
-</div>
+  </div>
   </div>
 
   <style>
     .flipping-tile {
-      width: 300px; 
-      height: 300px;
+      width: 100%; 
+      height: 100%;
       margin: 1rem; 
       border: 1px solid black;
       border-radius: 10px; 
@@ -45,6 +45,7 @@ template.innerHTML = `
 
     ::part(front-of-tile) { 
       background-color: #f5e9ee;
+      background-image: url('../../images/kanji6.png');
   
       /* The front of the tile is rotated 180 degrees by default to hide it from the user. */
       transform: rotateY(180deg);
@@ -52,6 +53,7 @@ template.innerHTML = `
 
     ::part(back-of-tile) { 
       background-color: red;
+      background-image: url('../../images/back-of-card.png');
     }
 
     .flipping-tile.is-flipped #wrapper {
@@ -67,6 +69,12 @@ template.innerHTML = `
     .flipping-tile.is-disabled {
       /* Will disable further user interaction (with the card) via both mouse and keyboard. */
       pointer-events: none;
+    }
+
+    .flipping-tile.is-hidden {
+      /* Will be used to hide the card from the user when there is a match. */
+      opacity: 0; 
+      transition: opacity 4s;
     }
   </style>
 `
@@ -111,6 +119,14 @@ customElements.define('flipping-tile',
 
       /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
       tile.classList.add('is-disabled')
+
+      /* I want to communicate to the memory game component that a tile has been flipped and dispatch the flipped tile element so that it can be compared to the previously flipped tile. */
+      const tileFlippedEvent = new CustomEvent('tile-is-flipped', {
+        detail: {
+          tile
+        }
+      })
+      this.dispatchEvent(tileFlippedEvent)
     }
 
     /**

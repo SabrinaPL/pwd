@@ -6,7 +6,7 @@ template.innerHTML = `
     <h1>Kanji memory game</h1>
     <p>Try to find all matching pairs of kanji!</p>
 
-    <!-- I want to dynamically render this text and the radio buttons below, so that I can hide the radio buttons when the game is in progress. -->
+<div id="start-game-info">
     <p>Choose game difficulty to start the game:</p>
     <div class="difficulty-buttons">
 
@@ -20,6 +20,7 @@ template.innerHTML = `
       <input type="radio" id="hard" name="difficulty" value="hard" data-columns="4" data-rows="4">
       <label for="hard">Hard</label>
     </div> 
+</div>
     <div id="memory-game-board">
     </div>
 <div>
@@ -38,12 +39,15 @@ template.innerHTML = `
   }
 
   .memory-game p {
-    margin: 0.1; 
+    margin: 0.5rem; 
     font-size: 1.5rem; 
   }
 
   #memory-game-board {
+    height: 50vh;
+    width: 90vw;
     display: grid;
+    grid-gap: 2rem; 
   }
 </style>
 `
@@ -59,11 +63,14 @@ customElements.define('memory-game',
  *
  */
   class extends HTMLElement {
+    #startGameInfo
     #memoryGameBoard
     #difficultyBtns
     #columns
     #rows
     #selectedTile
+    #tile
+    #numOfTries
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -80,6 +87,8 @@ customElements.define('memory-game',
      * Event listeners added when component is connected to DOM.
      */
     connectedCallback () {
+      this.#startGameInfo = this.shadowRoot.querySelector('#start-game-info')
+
       this.#memoryGameBoard = this.shadowRoot.querySelector('#memory-game-board')
 
       this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
@@ -99,6 +108,8 @@ customElements.define('memory-game',
      *
      */
     #renderMemoryGameBoard () {
+      this.#startGameInfo.style.display = 'none'
+
       // Clear the memory game board each time the user changes the difficulty level of the game.
       this.#memoryGameBoard.innerHTML = ''
 
@@ -109,24 +120,48 @@ customElements.define('memory-game',
       // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
       for (let i = 0; i < this.#columns * this.#rows; i++) {
         const flippingTile = document.createElement('flipping-tile')
+
+        /* I want to listen to when a tile has been flipped so that I can invoke the method that is responsible for the game logic. */
+        flippingTile.addEventListener('tile-is-flipped', (e) => {
+          this.#checkFlippedCards(e.detail.tile)
+        })
         this.#memoryGameBoard.append(flippingTile)
       }
     }
 
     /**
      * Method to check flipped cards, keep count of number of tries and number of remaining tiles.
-     *
+     * 
      */
-    #checkFlippedCards () {
+    #checkFlippedCards (tile) {
+      if (!this.#tile) {
+        this.#tile = tile
+      } else {
+        if (this.#tile.isEqualNode(tile)) {
+          tile.classList.add('is-hidden')
+          this.#tile.classList.add('is-hidden')
+          this.#tile = null
+        }
 
+        /* To keep track of number of tries, regardless of if there is a match or not */
+        this.#numOfTries++
+        console.log(this.#numOfTries)
+
+      // I have to store a tile to compare.
+      // I have to first check if there are any tiles already stored.
+      // If not, store the tile.
+      // If there is already a tile stored, go directly to comparison.
+      // If there is a tile stored, compare it to the tile in the current event.
+      // After comparison, reset the stored tile.
+      }
     }
 
     /**
      * Event listeners removed when component is disconnected from DOM.
      */
-    disconnectedCallback () {
+    /* disconnectedCallback () {
       this.#difficultyBtns.forEach(btn => {
         btn.removeEventListener('change', () => {})
       })
-    }
+    } */
   })
