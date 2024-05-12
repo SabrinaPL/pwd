@@ -4,7 +4,7 @@ const template = document.createElement('template')
 template.innerHTML = ` 
 <div class="memory-game">
     <h1>Kanji memory game</h1>
-    <p>Try to find all matching pairs of kanji!</p>
+    <p>Try to find all matching pairs of 漢字 (kanji)</p>
 
 <div id="start-game-info">
     <p>Choose game difficulty to start the game:</p>
@@ -12,13 +12,13 @@ template.innerHTML = `
 
       <!-- The data-columns and data-rows attributes are used to dynamically set the number of columns and rows in the memory game board. -->
       <input type="radio" id="easy" name="difficulty" value="easy" data-columns="2" data-rows="2">
-      <label for="easy">Easy</label>
+      <label for="easy"><strong>子供</strong> (Easy)</label>
 
       <input type="radio" id="medium" name="difficulty" value="medium" data-columns="4" data-rows="2">
-      <label for="medium">Medium</label>
+      <label for="medium"><strong>普通</strong> (Medium)</label>
 
       <input type="radio" id="hard" name="difficulty" value="hard" data-columns="4" data-rows="4">
-      <label for="hard">Hard</label>
+      <label for="hard"><strong>死ぬ</strong> (Hard)</label>
     </div> 
 </div>
     <div id="memory-game-board">
@@ -26,7 +26,8 @@ template.innerHTML = `
 <div>
 
 <style>
-  .memory-game {
+  .memory-game,
+  #start-game-info {
     display: flex; 
     flex-direction: column;
     align-items: center;
@@ -48,6 +49,10 @@ template.innerHTML = `
     width: 90vw;
     display: grid;
     grid-gap: 2rem; 
+  }
+
+  #start-game-info.is-hidden {
+    display: none;
   }
 </style>
 `
@@ -108,7 +113,7 @@ customElements.define('memory-game',
      *
      */
     #renderMemoryGameBoard () {
-      this.#startGameInfo.style.display = 'none'
+      this.#startGameInfo.classList.add('is-hidden')
 
       // Clear the memory game board each time the user changes the difficulty level of the game.
       this.#memoryGameBoard.innerHTML = ''
@@ -130,8 +135,26 @@ customElements.define('memory-game',
     }
 
     /**
+     * Method to handle which images will randomly be rendered to the front of the tiles.
+     *
+     */
+    #handleImages () {
+
+    }
+
+    /* Shuffle code from 21 card game
+  shuffle () {
+    for (let i = this.#playingCards.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1))
+      ;[this.#playingCards[i], this.#playingCards[randomIndex]] = [this.#playingCards[randomIndex], this.#playingCards[i]]
+    }
+  }
+  */
+
+    /**
      * Method to check flipped cards, keep count of number of tries and number of remaining tiles.
-     * 
+     *
+     * @param {HTMLElement} tile - The tile that has been flipped.
      */
     #checkFlippedCards (tile) {
       if (!this.#tile) {
@@ -141,18 +164,15 @@ customElements.define('memory-game',
           tile.classList.add('is-hidden')
           this.#tile.classList.add('is-hidden')
           this.#tile = null
+        } else {
+          tile.classList.remove('is-flipped')
+          this.#tile.classList.remove('is-flipped')
+          this.#tile = null
         }
 
         /* To keep track of number of tries, regardless of if there is a match or not */
         this.#numOfTries++
         console.log(this.#numOfTries)
-
-      // I have to store a tile to compare.
-      // I have to first check if there are any tiles already stored.
-      // If not, store the tile.
-      // If there is already a tile stored, go directly to comparison.
-      // If there is a tile stored, compare it to the tile in the current event.
-      // After comparison, reset the stored tile.
       }
     }
 
