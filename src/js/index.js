@@ -8,3 +8,5 @@
 import './components/flipping-tile/index.js'
 import './components/memory-game/index.js'
 import './components/pwd/index.js'
+import './components/window/index.js'
+import './components/app-icon/app-icon.js'

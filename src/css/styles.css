@@ -7,3 +7,14 @@ body {
 	background-color: #dee3e0; 
 	font-family: 'Dosis', Arial, Helvetica, sans-serif;
 }
+
+footer {
+	background-color: transparent;
+	color: #fff;
+	text-align: center;
+	padding: 10px;
+	position: absolute;
+	border-radius: 5px;
+	bottom: 0;
+	width: 100%;
+}

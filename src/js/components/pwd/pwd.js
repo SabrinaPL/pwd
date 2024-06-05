@@ -29,17 +29,19 @@ template.innerHTML = `
     #pwd {
       width: 100vw;
       height: 100vh;
-      background-color: #f5e9ee;
+      background-color: #C49BBB;
+      background-image: url('../../images/desktop-background.jpg');
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+      border-radius: 5px;
     }
 
     #desktop {
-      width: 90vw;
-      height: 80vh;
-      background-color: #f5e9ee;
-      border: 1px solid black;
+      width: 95vw;
+      height: 85vh;
+      background-color: transparent;
       border-radius: 10px;
       display: flex;
       justify-content: center;
@@ -64,8 +66,8 @@ customElements.define('personal-web-desktop',
    * PWD class.
    */
   class extends HTMLElement {
-    #appIcons
-    #appIconsContainer
+    #apps
+    #appsContainer
     #selectedAppWindow
     #runningApps
 
@@ -85,10 +87,12 @@ customElements.define('personal-web-desktop',
      * Event listeners added when component is connected to DOM.
      */
     connectedCallback () {
-      this.#appIconsContainer = this.shadowRoot.querySelector('#desktop-icons')
+      this.#appsContainer = this.shadowRoot.querySelector('#desktop-icons')
 
-      this.#appIcons = []
-      this.#runningApps = []
+      this.addEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
+
+      this.#apps = []
+      this.#runningApps = [{ /* id, name, customhtml (window) <- generates the html for the right window containing the right app dynamically */ }]
 
       this.#renderAppIcons()
 
@@ -104,6 +108,13 @@ customElements.define('personal-web-desktop',
       // add event listeners to open the applications in a new window, close the applications, and move the applications (+ minimize?)
     }
 
+    #renderRunningApps () {
+      // windows will be displayed in an absolute position inside the desktop element
+      // desktop in a relative position
+      // the windows will be displayed in the order they were opened
+
+    }
+
     /**
      * Method to focus on the selected app.
      */
@@ -114,8 +125,16 @@ customElements.define('personal-web-desktop',
 
     /**
      * Method to open the selected app.
+     *
+     * @param {string} appName - The name of the app to open.
      */
-    #openSelectedApp () {
+    #openSelectedApp (appName) {
+      if (appName === 'Memory Game') {
+        // Date.valueOf is used to generate a unique id for the app
+        this.#runningApps.push({ id: new Date().valueOf(), name: 'Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Memory Game</span></app-window>' })
+      }
+
+      // window object needs to be created dynamically
       // invoked when the user clicks on an app icon
       // add the selected app to the running apps array
     }

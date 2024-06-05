@@ -2,6 +2,11 @@
 
 const template = document.createElement('template')
 template.innerHTML = `
+  <div class="app-icon">
+    <img src="../images/ai-tutor.jpg" alt="App icon">
+    <span class="app-name"></span>
+  </div>
+
   <style>
     .app-icon {
       width: 100px;
@@ -13,6 +18,13 @@ template.innerHTML = `
       align-items: center;
       cursor: pointer;
     }
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+
   </style>
 `
 /**
@@ -46,11 +58,34 @@ customElements.define('app-icon',
       this.#appIcon.addEventListener('click', () => this.#openApp())
     }
 
+    static get observedAttributes () {
+      return ['name', 'image']
+    }
+
+    /**
+     * Method to update the component when attributes change.
+     *
+     * @param {string} name - The name of the app.
+     * @param {string} oldValue - The old value of the attribute.
+     * @param {string} newValue - The new value of the attribute.
+     */
+    attributeChangedCallback (name, oldValue, newValue) {
+      if (name === 'name') {
+        this.shadowRoot.querySelector('.app-name').textContent = newValue
+      } else if (name === 'image') {
+        this.shadowRoot.querySelector('img').src = newValue
+      }
+    }
+
     /**
      * Method to open an app.
      *
      */
     #openApp () {
-      // dispatch open app event
+      this.dispatchEvent(new CustomEvent('openApp', {
+        detail: {
+          app: this.getAttribute('name')
+        }
+      }))
     }
   })
