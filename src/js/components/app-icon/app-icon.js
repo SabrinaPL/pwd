@@ -1,9 +1,7 @@
-// attributes for the icon, image and name
-
 const template = document.createElement('template')
 template.innerHTML = `
   <div class="app-icon">
-    <img src="../images/ai-tutor.jpg" alt="App icon">
+    <img src="" alt="App icon">
     <span class="app-name"></span>
   </div>
 
@@ -11,8 +9,8 @@ template.innerHTML = `
     .app-icon {
       width: 100px;
       height: 100px;
-      background-color: #f5e9ee;
-      border-radius: 50%;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 25%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,9 +18,13 @@ template.innerHTML = `
     }
 
     img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
+      width: 90px;
+      height: 90px;
+      border-radius: 25%;
+    }
+
+    img:hover {
+      transform: scale(1.1);
     }
 
   </style>
@@ -58,6 +60,11 @@ customElements.define('app-icon',
       this.#appIcon.addEventListener('click', () => this.#openApp())
     }
 
+    /**
+     * Method to observe attributes.
+     *
+     * @returns {string[]} - The name and image of the app.
+     */
     static get observedAttributes () {
       return ['name', 'image']
     }

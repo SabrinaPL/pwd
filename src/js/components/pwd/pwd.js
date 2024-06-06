@@ -15,13 +15,13 @@
 // pros of rendering the icons dynamically: easy to add new applications
 // in the connectedCallback the icons should be rendered dynamically when the desktop is connected to the DOM
 
+import '../app-icon/app-icon'
+
 const template = document.createElement('template')
 template.innerHTML = `
   <main id="pwd">
-    <div id="desktop">
-      <div id="desktop-icons">
+    <div id="desktop-icons">
       <!-- app icons should be rendered here -->
-      </div>
     </div>
   </main>
 
@@ -38,23 +38,18 @@ template.innerHTML = `
       border-radius: 5px;
     }
 
-    #desktop {
-      width: 95vw;
-      height: 85vh;
-      background-color: transparent;
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
     #desktop-icons {
+      width: 95vw;
+      height: 95vh;
       display: grid;
       grid-template-columns: repeat(auto-fill, 100px);
-      grid-gap: 1rem;
-      justify-content: left;
+      grid-gap: 2rem;
+      justify-content: center;
       align-items: center;
+      border-radius: 5px;
+      position: absolute;
     }
+
   </style>
 `
 /**
@@ -91,7 +86,7 @@ customElements.define('personal-web-desktop',
 
       this.addEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
 
-      this.#apps = []
+      this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }]
       this.#runningApps = [{ /* id, name, customhtml (window) <- generates the html for the right window containing the right app dynamically */ }]
 
       this.#renderAppIcons()
@@ -104,15 +99,33 @@ customElements.define('personal-web-desktop',
      * Method to render the app icons.
      */
     #renderAppIcons () {
+      this.#apps.forEach(app => {
+        const appIcon = document.createElement('app-icon')
+        appIcon.setAttribute('name', app.name)
+        appIcon.setAttribute('image', app.image)
+        appIcon.addEventListener('click', () => this.#openSelectedApp(app.name))
+        this.#appsContainer.appendChild(appIcon)
+      })
+
+      // loop through the apps array and render the app icons
       // render app icons dynamically
       // add event listeners to open the applications in a new window, close the applications, and move the applications (+ minimize?)
     }
 
+    /**
+     * Method to render the running apps in a window component.
+     *
+     */
     #renderRunningApps () {
+      this.#runningApps.forEach(app => {
+        const appWindow = document.createElement('div')
+        appWindow.innerHTML = app.customHtml
+        this.shadowRoot.appendChild(appWindow)
+      })
+
       // windows will be displayed in an absolute position inside the desktop element
       // desktop in a relative position
       // the windows will be displayed in the order they were opened
-
     }
 
     /**
@@ -129,10 +142,17 @@ customElements.define('personal-web-desktop',
      * @param {string} appName - The name of the app to open.
      */
     #openSelectedApp (appName) {
-      if (appName === 'Memory Game') {
+      console.log(appName)
+
+      if (appName === 'Kanji Memory') {
         // Date.valueOf is used to generate a unique id for the app
-        this.#runningApps.push({ id: new Date().valueOf(), name: 'Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Memory Game</span></app-window>' })
+        this.#runningApps.push({ id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span></app-window>' })
       }
+      if (appName === 'AI Tutor') {
+        this.#runningApps.push({ id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<app-window><ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span></app-window>' })
+      }
+
+      this.#renderRunningApps()
 
       // window object needs to be created dynamically
       // invoked when the user clicks on an app icon
