@@ -33,6 +33,8 @@ template.innerHTML = `
     align-items: center;
     font-size: 20px; 
     font-weight: medium;
+    width: 100%; 
+    height: 100%; 
   }
 
   .memory-game h1 {
@@ -45,10 +47,12 @@ template.innerHTML = `
   }
 
   #memory-game-board {
-    height: 50vh;
-    width: 90vw;
+    width: 100%;
     display: grid;
-    grid-gap: 2rem; 
+    grid-gap: 2rem;
+    flex: 1; 
+    padding: 1rem;
+    box-sizing: border-box;
   }
 
   #start-game-info.is-hidden {

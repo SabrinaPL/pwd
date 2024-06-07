@@ -1,20 +1,27 @@
 const template = document.createElement('template')
 template.innerHTML = `
   <div class="app-icon">
-    <img src="" alt="App icon">
-    <span class="app-name"></span>
+    <img src="" alt="App icon"><!-- app icon goes here -->
+    <span class="app-name"><!-- app name goes here --></span>
   </div>
 
   <style>
     .app-icon {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       background-color: rgba(255,255,255,0.5);
       border-radius: 25%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      padding: 10px;
+    }
+
+    .app-name {
+      margin-top: 0.5rem;
+      font-size: 1rem;
     }
 
     img {

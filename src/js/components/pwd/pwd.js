@@ -16,13 +16,17 @@
 // in the connectedCallback the icons should be rendered dynamically when the desktop is connected to the DOM
 
 import '../app-icon/app-icon'
+import '../window/window'
 
 const template = document.createElement('template')
 template.innerHTML = `
   <main id="pwd">
-    <div id="desktop-icons">
+  <div id="desktop-wrapper">
+    <div id="apps-container">
       <!-- app icons should be rendered here -->
     </div>
+      <!-- app window should be rendered here -->
+  </div>
   </main>
 
   <style>
@@ -43,7 +47,7 @@ template.innerHTML = `
       height: 95vh;
       display: grid;
       grid-template-columns: repeat(auto-fill, 100px);
-      grid-gap: 2rem;
+      grid-gap: 4rem;
       justify-content: center;
       align-items: center;
       border-radius: 5px;
@@ -63,6 +67,7 @@ customElements.define('personal-web-desktop',
   class extends HTMLElement {
     #apps
     #appsContainer
+    #desktopWrapper
     #selectedAppWindow
     #runningApps
 
@@ -82,12 +87,13 @@ customElements.define('personal-web-desktop',
      * Event listeners added when component is connected to DOM.
      */
     connectedCallback () {
-      this.#appsContainer = this.shadowRoot.querySelector('#desktop-icons')
+      this.#desktopWrapper = this.shadowRoot.querySelector('#desktop-wrapper')
+      this.#appsContainer = this.shadowRoot.querySelector('#apps-container')
 
       this.addEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
 
-      this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }]
-      this.#runningApps = [{ /* id, name, customhtml (window) <- generates the html for the right window containing the right app dynamically */ }]
+      this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
+      this.#runningApps = [{ /* id, name, customhtml <- generates the html for the right window containing the right app dynamically */ }]
 
       this.#renderAppIcons()
 
@@ -118,9 +124,11 @@ customElements.define('personal-web-desktop',
      */
     #renderRunningApps () {
       this.#runningApps.forEach(app => {
-        const appWindow = document.createElement('div')
+        const appWindow = document.createElement('window')
+        appWindow.setAttribute('id', app.id)
+        appWindow.setAttribute('name', app.name)
         appWindow.innerHTML = app.customHtml
-        this.shadowRoot.appendChild(appWindow)
+        this.#desktopWrapper.appendChild(appWindow)
       })
 
       // windows will be displayed in an absolute position inside the desktop element
@@ -142,14 +150,15 @@ customElements.define('personal-web-desktop',
      * @param {string} appName - The name of the app to open.
      */
     #openSelectedApp (appName) {
-      console.log(appName)
-
       if (appName === 'Kanji Memory') {
         // Date.valueOf is used to generate a unique id for the app
         this.#runningApps.push({ id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span></app-window>' })
       }
       if (appName === 'AI Tutor') {
         this.#runningApps.push({ id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<app-window><ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span></app-window>' })
+      }
+      if (appName === 'Language Chat') {
+        this.#runningApps.push({ id: new Date().valueOf(), name: 'Language Chat', customHtml: '<app-window><language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span></app-window>' })
       }
 
       this.#renderRunningApps()

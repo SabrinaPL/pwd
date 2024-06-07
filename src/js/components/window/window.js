@@ -12,15 +12,12 @@
 const template = document.createElement('template')
 template.innerHTML = `
   <div id="window">
-    <h1>Window title</h1>
-    <div id="window-title">
-      <!-- title goes here -->
-      <h3><slot name="app-title"></slot></h3>
+    <div id="window-header">
+      <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
       <button id="close-window">X</button>
-    <div id="window-component">
-      App component goes here
-      <!-- window component goes here --> 
-      <slot name="app"></slot>
+    </div>
+    <div id="app-component">
+      <slot name="app"><!-- app component goes here --></slot>
     </div>
   </div>
 
@@ -29,25 +26,31 @@ template.innerHTML = `
       position: absolute;
       width: 500px;
       height: 500px;
-      padding: 1rem;
-      background-color: white;
+      padding: 0;
+      background-color: #E4DFDA;
       border: 1px solid black;
       border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    #window-title {
+    #window-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #f5e9ee;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
+      background-color: rgba(255,255,255,0.5);
+      padding: 0.5rem 1rem;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
+      border-bottom: 1px solid black;
     }
 
-    #window-component {
-      padding: 1rem;
+    #app-component {
+      flex: 1;
+      flex-direction: column;
+      padding: 0.5rem;
+      overflow: auto;
     }
 
     #close-window {
@@ -82,5 +85,33 @@ customElements.define('app-window',
 
       this.attachShadow({ mode: 'open' })
       this.shadowRoot.appendChild(template.content.cloneNode(true))
+    }
+
+    connectedCallback () {
+      this.addEventListener('mousedown', this.#moveWindow)
+      this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
+    }
+
+    /**
+     * Method to close the window.
+     *
+     */
+    #closeWindow () {
+      this.remove()
+    }
+
+    /**
+     * Method to move the window.
+     *
+     */
+    #moveWindow () {
+      this.setAttribute('draggable', 'true')
+      // dragstart, dragstop and dragover events are needed to make the element draggable (handle positioning)
+    }
+
+    #changeWindowSize () {
+    }
+
+    #minimalizeWindow () {
     }
   })
