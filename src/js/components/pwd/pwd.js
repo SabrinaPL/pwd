@@ -93,7 +93,9 @@ customElements.define('personal-web-desktop',
       this.addEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
 
       this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
-      this.#runningApps = [{ /* id, name, customhtml <- generates the html for the right window containing the right app dynamically */ }]
+      this.#runningApps = [{}]
+
+      this.addEventListener('close-app', () => this.#closeSelectedApp())
 
       this.#renderAppIcons()
 
@@ -119,16 +121,25 @@ customElements.define('personal-web-desktop',
     }
 
     /**
+     * Method to render the selected app.
+     *
+     * @param {*} app - The app to render.
+     */
+    #renderApp (app) {
+      const appWindow = document.createElement('window')
+      appWindow.setAttribute('id', app.id)
+      appWindow.setAttribute('name', app.name)
+      appWindow.innerHTML = app.customHtml
+      this.#desktopWrapper.appendChild(appWindow)
+    }
+
+    /**
      * Method to render the running apps in a window component.
      *
      */
     #renderRunningApps () {
       this.#runningApps.forEach(app => {
-        const appWindow = document.createElement('window')
-        appWindow.setAttribute('id', app.id)
-        appWindow.setAttribute('name', app.name)
-        appWindow.innerHTML = app.customHtml
-        this.#desktopWrapper.appendChild(appWindow)
+        this.#renderApp(app)
       })
 
       // windows will be displayed in an absolute position inside the desktop element
@@ -152,16 +163,20 @@ customElements.define('personal-web-desktop',
     #openSelectedApp (appName) {
       if (appName === 'Kanji Memory') {
         // Date.valueOf is used to generate a unique id for the app
-        this.#runningApps.push({ id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span></app-window>' })
+        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span></app-window>' }
+        this.#renderApp(memoryApp)
+        this.#runningApps.push(memoryApp)
       }
       if (appName === 'AI Tutor') {
-        this.#runningApps.push({ id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<app-window><ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span></app-window>' })
+        const aiTutor = { id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<app-window><ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span></app-window>' }
+        this.#renderApp(aiTutor)
+        this.#runningApps.push(aiTutor)
       }
       if (appName === 'Language Chat') {
-        this.#runningApps.push({ id: new Date().valueOf(), name: 'Language Chat', customHtml: '<app-window><language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span></app-window>' })
+        const chatApp = { id: new Date().valueOf(), name: 'Language Chat', customHtml: '<app-window><language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span></app-window>' }
+        this.#renderApp(chatApp)
+        this.#runningApps.push(chatApp)
       }
-
-      this.#renderRunningApps()
 
       // window object needs to be created dynamically
       // invoked when the user clicks on an app icon
@@ -170,8 +185,10 @@ customElements.define('personal-web-desktop',
 
     /**
      * Method to close the selected app.
+     *
      */
     #closeSelectedApp () {
+      console.log('closing apps')
       // invoked when the user closes an app window
       // remove the selected app from the running apps array
     }

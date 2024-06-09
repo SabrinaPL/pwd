@@ -3,7 +3,7 @@ template.innerHTML = `
   <div class="flipping-tile">
   <div id="wrapper">
     <div part="front-of-tile">
-      <slot name="front"></slot>
+      <slot name="front"><!-- random kanji image will be rendered here --></slot>
     </div>
     <div part="back-of-tile">
     </div>
@@ -45,7 +45,6 @@ template.innerHTML = `
 
     ::part(front-of-tile) { 
       background-color: #f5e9ee;
-      background-image: url('../../images/kanji6.png');
   
       /* The front of the tile is rotated 180 degrees by default to hide it from the user. */
       transform: rotateY(180deg);
@@ -85,10 +84,10 @@ template.innerHTML = `
  *
  */
 customElements.define('flipping-tile',
-/**
- * Flipping tile class.
- *
- */
+  /**
+   * Flipping tile class.
+   *
+   */
   class extends HTMLElement {
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -107,6 +106,9 @@ customElements.define('flipping-tile',
     connectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.addEventListener('click', () => this.#flipTile(tile))
+      tile.addEventListener('render-front-of-tile', (e) => {
+        this.#renderFrontOfTile(e.detail.image)
+      })
     }
 
     /**
@@ -130,11 +132,25 @@ customElements.define('flipping-tile',
     }
 
     /**
+     * Method to dynamically render the image on the front of the tile.
+     *
+     * @param {string} image - The image to be rendered on the front of the tile.
+     */
+    #renderFrontOfTile (image) {
+      console.log(image)
+      const frontOfTile = this.shadowRoot.querySelector('slot[name="front"]')
+      frontOfTile.innerHTML = `<img src=${image} alt="kanji image" />`
+    }
+
+    /**
      * Event listeners removed when component is removed from DOM.
      *
      */
     disconnectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
-      tile.removeEventListener('click')
+      tile.removeEventListener('click', () => this.#flipTile(tile))
+      tile.removeEventListener('render-front-of-tile', (e) => {
+        this.#renderFrontOfTile(e.detail.image)
+      })
     }
   })

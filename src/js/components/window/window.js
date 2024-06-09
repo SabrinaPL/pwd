@@ -97,6 +97,7 @@ customElements.define('app-window',
      *
      */
     #closeWindow () {
+      this.dispatchEvent(new CustomEvent('close-app'))
       this.remove()
     }
 

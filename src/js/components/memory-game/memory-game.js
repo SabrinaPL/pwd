@@ -67,10 +67,10 @@ template.innerHTML = `
  *
  */
 customElements.define('memory-game',
-/**
- * Memory game class.
- *
- */
+  /**
+   * Memory game class.
+   *
+   */
   class extends HTMLElement {
     #startGameInfo
     #memoryGameBoard
@@ -80,6 +80,7 @@ customElements.define('memory-game',
     #selectedTile
     #tile
     #numOfTries
+    #memorycards
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -101,6 +102,10 @@ customElements.define('memory-game',
       this.#memoryGameBoard = this.shadowRoot.querySelector('#memory-game-board')
 
       this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
+
+      this.#numOfTries = 0
+
+      this.#memorycards = ['../../images/kanji1.png', '../../images/kanji2.png', '../../images/kanji3.png', '../../images/kanji4.png', '../../images/kanji5.png', '../../images/kanji6.png', '../../images/kanji7.png', '../../images/kanji8.png', '../../images/kanji9.png'] // <-- Should the images be duplicated here?
 
       // Loop through the radio buttons and add event listeners that listen to when the user selects a radio button (so that the grid size can be rendered dynamically).
       this.#difficultyBtns.forEach(btn => {
@@ -126,14 +131,20 @@ customElements.define('memory-game',
       this.#memoryGameBoard.style.gridTemplateColumns = `repeat(${this.#columns}, 1fr)`
       this.#memoryGameBoard.style.gridTemplateRows = `repeat(${this.#rows}, 1fr)`
 
+      // Shuffle the images that will be rendered to the front of tiles.
+      this.#shuffleImages()
+
       // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
       for (let i = 0; i < this.#columns * this.#rows; i++) {
         const flippingTile = document.createElement('flipping-tile')
+
+        // Dispatch event to render the front of the tile with the image? Or setAttribute?
 
         /* I want to listen to when a tile has been flipped so that I can invoke the method that is responsible for the game logic. */
         flippingTile.addEventListener('tile-is-flipped', (e) => {
           this.#checkFlippedCards(e.detail.tile)
         })
+
         this.#memoryGameBoard.append(flippingTile)
       }
     }
@@ -142,18 +153,13 @@ customElements.define('memory-game',
      * Method to handle which images will randomly be rendered to the front of the tiles.
      *
      */
-    #handleImages () {
-
+    #shuffleImages () {
+      // Shuffle the memory cards array so that the images are randomly placed on the board (shuffle algorithm reused from the 21 game).
+      for (let i = this.#memorycards.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1))
+        ;[this.#memorycards[i], this.#memorycards[randomIndex]] = [this.#memorycards[randomIndex], this.#memorycards[i]]
+      }
     }
-
-    /* Shuffle code from 21 card game
-  shuffle () {
-    for (let i = this.#playingCards.length - 1; i > 0; i--) {
-      const randomIndex = Math.floor(Math.random() * (i + 1))
-      ;[this.#playingCards[i], this.#playingCards[randomIndex]] = [this.#playingCards[randomIndex], this.#playingCards[i]]
-    }
-  }
-  */
 
     /**
      * Method to check flipped cards, keep count of number of tries and number of remaining tiles.
@@ -176,16 +182,15 @@ customElements.define('memory-game',
 
         /* To keep track of number of tries, regardless of if there is a match or not */
         this.#numOfTries++
-        console.log(this.#numOfTries)
       }
     }
 
     /**
      * Event listeners removed when component is disconnected from DOM.
      */
-    /* disconnectedCallback () {
+    disconnectedCallback () {
       this.#difficultyBtns.forEach(btn => {
         btn.removeEventListener('change', () => {})
       })
-    } */
+    }
   })
