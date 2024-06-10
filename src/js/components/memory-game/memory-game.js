@@ -3,7 +3,7 @@ import '../flipping-tile/flipping-tile'
 const template = document.createElement('template')
 template.innerHTML = ` 
 <div class="memory-game">
-    <h1>Kanji memory game</h1>
+    <h1>Kanji memory</h1>
     <p>Try to find all matching pairs of 漢字 (kanji)</p>
 
 <div id="start-game-info">

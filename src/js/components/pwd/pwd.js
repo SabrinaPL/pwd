@@ -42,16 +42,24 @@ template.innerHTML = `
       border-radius: 5px;
     }
 
-    #desktop-icons {
-      width: 95vw;
-      height: 95vh;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, 100px);
-      grid-gap: 4rem;
-      justify-content: center;
-      align-items: center;
-      border-radius: 5px;
+    #desktop-wrapper {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+
+    #apps-container {
       position: absolute;
+      display: flex;
+      gap: 1rem;
+      bottom: 1rem;
+      left: 50%; 
+      transform: translateX(-50%);
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      padding: 1.5rem;
+      min-width: 50%;
+      justify-content: center;
     }
 
   </style>
@@ -95,8 +103,6 @@ customElements.define('personal-web-desktop',
       this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
       this.#runningApps = [{}]
 
-      this.addEventListener('close-app', () => this.#closeSelectedApp())
-
       this.#renderAppIcons()
 
       // add loop to render app-icons dynamically and add event listeners to open the applications in a new window
@@ -126,10 +132,12 @@ customElements.define('personal-web-desktop',
      * @param {*} app - The app to render.
      */
     #renderApp (app) {
-      const appWindow = document.createElement('window')
+      const appWindow = document.createElement('app-window')
       appWindow.setAttribute('id', app.id)
       appWindow.setAttribute('name', app.name)
       appWindow.innerHTML = app.customHtml
+      appWindow.addEventListener('close-app', () => this.#closeSelectedApp(app.id))
+      appWindow.addEventListener('drag', (e) => this.dragWindow(e))
       this.#desktopWrapper.appendChild(appWindow)
     }
 
@@ -163,17 +171,17 @@ customElements.define('personal-web-desktop',
     #openSelectedApp (appName) {
       if (appName === 'Kanji Memory') {
         // Date.valueOf is used to generate a unique id for the app
-        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<app-window><memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span></app-window>' }
+        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span>' }
         this.#renderApp(memoryApp)
         this.#runningApps.push(memoryApp)
       }
       if (appName === 'AI Tutor') {
-        const aiTutor = { id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<app-window><ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span></app-window>' }
+        const aiTutor = { id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span>' }
         this.#renderApp(aiTutor)
         this.#runningApps.push(aiTutor)
       }
       if (appName === 'Language Chat') {
-        const chatApp = { id: new Date().valueOf(), name: 'Language Chat', customHtml: '<app-window><language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span></app-window>' }
+        const chatApp = { id: new Date().valueOf(), name: 'Language Chat', customHtml: '<language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span>' }
         this.#renderApp(chatApp)
         this.#runningApps.push(chatApp)
       }
@@ -186,10 +194,19 @@ customElements.define('personal-web-desktop',
     /**
      * Method to close the selected app.
      *
+     * @param {string} windowId - The id of the window to close.
      */
-    #closeSelectedApp () {
-      console.log('closing apps')
+    #closeSelectedApp (windowId) {
+      const appIndex = this.#runningApps.findIndex(app => app.id === windowId)
+      this.#runningApps.splice(appIndex, 1)
+      this.shadowRoot.getElementById(windowId).remove()
       // invoked when the user closes an app window
       // remove the selected app from the running apps array
+      console.log(this.#runningApps)
+    }
+
+    disconnectedCallback () {
+      this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
+      this.removeEventListener('close-app', () => this.#closeSelectedApp())
     }
   })

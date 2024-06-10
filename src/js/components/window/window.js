@@ -11,7 +11,7 @@
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <div id="window">
+  <div id="app-window">
     <div id="window-header">
       <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
       <button id="close-window">X</button>
@@ -22,7 +22,7 @@ template.innerHTML = `
   </div>
 
   <style>
-    #window {
+    #app-window {
       position: absolute;
       width: 500px;
       height: 500px;
@@ -88,7 +88,6 @@ customElements.define('app-window',
     }
 
     connectedCallback () {
-      this.addEventListener('mousedown', this.#moveWindow)
       this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
     }
 
@@ -97,15 +96,18 @@ customElements.define('app-window',
      *
      */
     #closeWindow () {
-      this.dispatchEvent(new CustomEvent('close-app'))
-      this.remove()
+      console.log('closing window')
+      this.dispatchEvent(new CustomEvent('close-app', {
+        detail: this.id
+      }))
     }
 
     /**
      * Method to move the window.
      *
      */
-    #moveWindow () {
+    dragWindow (event) {
+      console.log(event)
       this.setAttribute('draggable', 'true')
       // dragstart, dragstop and dragover events are needed to make the element draggable (handle positioning)
     }
