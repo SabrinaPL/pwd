@@ -1,4 +1,3 @@
-// this will be the "desktop" where the user can interact with the icons of the other components to open them in a new window
 // should it be possible to change desktop background? (maybe a settings icon that opens a settings window where the user can change the background image?)
 
 // which responsibilities should the desktop have?
@@ -98,15 +97,11 @@ customElements.define('personal-web-desktop',
       this.#desktopWrapper = this.shadowRoot.querySelector('#desktop-wrapper')
       this.#appsContainer = this.shadowRoot.querySelector('#apps-container')
 
-      this.addEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
-
       this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
+
       this.#runningApps = [{}]
 
       this.#renderAppIcons()
-
-      // add loop to render app-icons dynamically and add event listeners to open the applications in a new window
-      // listeners to listen to when the user clicks on the desktop icons to trigger open application events, close application events, and move application events
     }
 
     /**
@@ -120,10 +115,6 @@ customElements.define('personal-web-desktop',
         appIcon.addEventListener('click', () => this.#openSelectedApp(app.name))
         this.#appsContainer.appendChild(appIcon)
       })
-
-      // loop through the apps array and render the app icons
-      // render app icons dynamically
-      // add event listeners to open the applications in a new window, close the applications, and move the applications (+ minimize?)
     }
 
     /**
@@ -149,16 +140,15 @@ customElements.define('personal-web-desktop',
       this.#runningApps.forEach(app => {
         this.#renderApp(app)
       })
-
-      // windows will be displayed in an absolute position inside the desktop element
-      // desktop in a relative position
-      // the windows will be displayed in the order they were opened
     }
 
     /**
      * Method to focus on the selected app.
+     * 
+     * @param {string} app - The app to focus.
      */
-    #focusSelectedApp () {
+    #focusSelectedApp (app) {
+      app.focus()
       // invoked when the user clicks/tabs to an app icon
       // app in focus should be on top of all other apps
     }
@@ -185,26 +175,22 @@ customElements.define('personal-web-desktop',
         this.#renderApp(chatApp)
         this.#runningApps.push(chatApp)
       }
-
-      // window object needs to be created dynamically
-      // invoked when the user clicks on an app icon
-      // add the selected app to the running apps array
     }
 
     /**
-     * Method to close the selected app.
+     * Method to remove the selected app from running apps.
      *
-     * @param {string} windowId - The id of the window to close.
+     * @param {string} windowId - The id of the window to remove.
      */
     #closeSelectedApp (windowId) {
+      // Find the app in the running apps array and remove it.
       const appIndex = this.#runningApps.findIndex(app => app.id === windowId)
       this.#runningApps.splice(appIndex, 1)
-      this.shadowRoot.getElementById(windowId).remove()
-      // invoked when the user closes an app window
-      // remove the selected app from the running apps array
-      console.log(this.#runningApps)
     }
 
+    /**
+     * Disconnect event listeners when component is disconnected from DOM.
+     */
     disconnectedCallback () {
       this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
       this.removeEventListener('close-app', () => this.#closeSelectedApp())

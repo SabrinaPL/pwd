@@ -1,5 +1,3 @@
-// implement window api here?
-
 // which responsibilities should the window have?
 // Window size
 // Window close functionality
@@ -11,7 +9,7 @@
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <div id="app-window">
+  <div id="app-window" draggable="true">
     <div id="window-header">
       <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
       <button id="close-window">X</button>
@@ -27,19 +25,22 @@ template.innerHTML = `
       width: 500px;
       height: 500px;
       padding: 0;
-      background-color: #E4DFDA;
+      background-color: white;
       border: 1px solid black;
       border-radius: 10px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+  
+      left: 35%; <!-- Default position -->
+      right: 65%; <!-- Default position -->
     }
 
     #window-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: rgba(255,255,255,0.5);
+      background-color: #C5C5C5;
       padding: 0.5rem 1rem;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
@@ -55,7 +56,6 @@ template.innerHTML = `
 
     #close-window {
       background-color: red;
-      color: white;
       border: none;
       border-radius: 50%;
       width: 20px;
@@ -87,6 +87,9 @@ customElements.define('app-window',
       this.shadowRoot.appendChild(template.content.cloneNode(true))
     }
 
+    /**
+     * Event listeners added when component is connected to DOM.
+     */
     connectedCallback () {
       this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
     }
@@ -96,25 +99,27 @@ customElements.define('app-window',
      *
      */
     #closeWindow () {
-      console.log('closing window')
       this.dispatchEvent(new CustomEvent('close-app', {
         detail: this.id
       }))
+      this.remove()
     }
 
     /**
      * Method to move the window.
      *
+     * @param {Event} event - The event object.
      */
     dragWindow (event) {
-      console.log(event)
-      this.setAttribute('draggable', 'true')
       // dragstart, dragstop and dragover events are needed to make the element draggable (handle positioning)
     }
 
-    #changeWindowSize () {
+    changeWindowSize () {
     }
 
-    #minimalizeWindow () {
+    minimalizeWindow () {
+    }
+
+    focusWindow () {
     }
   })

@@ -28,10 +28,12 @@ template.innerHTML = `
       width: 90px;
       height: 90px;
       border-radius: 25%;
+      transition: transform 0.5s;
     }
 
     img:hover {
       transform: scale(1.1);
+      transition: transform 0.5s;
     }
 
   </style>
