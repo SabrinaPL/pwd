@@ -48,6 +48,7 @@ template.innerHTML = `
 
   #memory-game-board {
     width: 100%;
+    height: 100%;
     display: grid;
     grid-gap: 2rem;
     flex: 1; 

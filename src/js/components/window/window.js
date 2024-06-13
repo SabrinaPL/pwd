@@ -9,7 +9,7 @@
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <div id="app-window" draggable="true">
+  <div id="app-window">
     <div id="window-header">
       <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
       <button id="close-window">X</button>
@@ -20,17 +20,16 @@ template.innerHTML = `
   </div>
 
   <style>
-    #app-window {
+    :host {
       position: absolute;
-      width: 500px;
-      height: 500px;
+      min-width: 500px;
+      min-height: 500px;
       padding: 0;
       background-color: white;
       border: 1px solid black;
       border-radius: 10px;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
+      resize: both;
   
       left: 35%; <!-- Default position -->
       right: 65%; <!-- Default position -->
@@ -45,6 +44,7 @@ template.innerHTML = `
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       border-bottom: 1px solid black;
+      cursor: move;
     }
 
     #app-component {
@@ -62,6 +62,7 @@ template.innerHTML = `
       height: 20px;
       cursor: pointer;
     }
+
   </style>
 `
 
@@ -92,6 +93,12 @@ customElements.define('app-window',
      */
     connectedCallback () {
       this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
+      this.shadowRoot.querySelector('#window-header').addEventListener('mousedown', (event) => {
+        this.addEventListener('mousemove', this.dragWindow)
+      })
+      this.addEventListener('mouseup', () => {
+        this.removeEventListener('mousemove', this.dragWindow)
+      })
     }
 
     /**
@@ -111,7 +118,14 @@ customElements.define('app-window',
      * @param {Event} event - The event object.
      */
     dragWindow (event) {
-      // dragstart, dragstop and dragover events are needed to make the element draggable (handle positioning)
+      const movementX = event.movementX
+      const movementY = event.movementY
+      const computedStyle = window.getComputedStyle(this)
+      const leftValue = parseInt(computedStyle.left)
+      const topValue = parseInt(computedStyle.top)
+
+      this.style.left = `${leftValue + movementX}px`
+      this.style.top = `${topValue + movementY}px`
     }
 
     changeWindowSize () {
@@ -120,6 +134,10 @@ customElements.define('app-window',
     minimalizeWindow () {
     }
 
+    /**
+     * Method to focus the window.
+     */
     focusWindow () {
+      this.dispatchEvent(new CustomEvent('focus-app'))
     }
   })

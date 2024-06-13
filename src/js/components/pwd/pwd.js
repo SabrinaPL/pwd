@@ -61,6 +61,13 @@ template.innerHTML = `
       justify-content: center;
     }
 
+    app-window:focus {
+      border: 2px solid black;
+      z-index: 1;
+      outline: none;
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;  
+    }
+
   </style>
 `
 /**
@@ -75,8 +82,8 @@ customElements.define('personal-web-desktop',
     #apps
     #appsContainer
     #desktopWrapper
-    #selectedAppWindow
     #runningApps
+    #currentApp
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -99,7 +106,7 @@ customElements.define('personal-web-desktop',
 
       this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
 
-      this.#runningApps = [{}]
+      this.#runningApps = []
 
       this.#renderAppIcons()
     }
@@ -127,30 +134,24 @@ customElements.define('personal-web-desktop',
       appWindow.setAttribute('id', app.id)
       appWindow.setAttribute('name', app.name)
       appWindow.innerHTML = app.customHtml
+      appWindow.setAttribute('tabindex', '0')
+
       appWindow.addEventListener('close-app', () => this.#closeSelectedApp(app.id))
-      appWindow.addEventListener('drag', (e) => this.dragWindow(e))
+      appWindow.addEventListener('click', () => {
+        this.#currentApp = appWindow
+      })
       this.#desktopWrapper.appendChild(appWindow)
+      appWindow.focus()
     }
 
     /**
      * Method to render the running apps in a window component.
      *
      */
-    #renderRunningApps () {
+    #renderRunningApps() {
       this.#runningApps.forEach(app => {
         this.#renderApp(app)
       })
-    }
-
-    /**
-     * Method to focus on the selected app.
-     * 
-     * @param {string} app - The app to focus.
-     */
-    #focusSelectedApp (app) {
-      app.focus()
-      // invoked when the user clicks/tabs to an app icon
-      // app in focus should be on top of all other apps
     }
 
     /**
@@ -191,7 +192,7 @@ customElements.define('personal-web-desktop',
     /**
      * Disconnect event listeners when component is disconnected from DOM.
      */
-    disconnectedCallback () {
+    disconnectedCallback() {
       this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
       this.removeEventListener('close-app', () => this.#closeSelectedApp())
     }
