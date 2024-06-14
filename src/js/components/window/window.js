@@ -50,8 +50,9 @@ template.innerHTML = `
     #app-component {
       flex: 1;
       flex-direction: column;
-      padding: 0.5rem;
       overflow: auto;
+      background-color: #F5F5F5;
+      padding: 1rem;
     }
 
     #close-window {

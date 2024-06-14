@@ -14,9 +14,6 @@
 // pros of rendering the icons dynamically: easy to add new applications
 // in the connectedCallback the icons should be rendered dynamically when the desktop is connected to the DOM
 
-import '../app-icon/app-icon'
-import '../window/window'
-
 const template = document.createElement('template')
 template.innerHTML = `
   <main id="pwd">
@@ -98,23 +95,29 @@ customElements.define('personal-web-desktop',
     }
 
     /**
-     * Event listeners added when component is connected to DOM.
+     * Executed when component has been connected to the DOM.
      */
     connectedCallback () {
       this.#desktopWrapper = this.shadowRoot.querySelector('#desktop-wrapper')
       this.#appsContainer = this.shadowRoot.querySelector('#apps-container')
-
-      this.#apps = [{ name: 'Kanji Memory', image: '../../images/kanji9.png' }, { name: 'AI Tutor', image: '../../images/ai-tutor.jpg' }, { name: 'Language Chat', image: '../../images/language-exchange.webp' }]
+      this.#apps = [
+        { name: 'Kanji Memory', image: '../../images/kanji9.png' },
+        { name: 'AI Translator', image: '../../images/ai-tutor.jpg' },
+        { name: 'Language Chat', image: '../../images/language-exchange.webp' }
+      ]
 
       this.#runningApps = []
 
+      // Render the app icons when the component is connected to the DOM
       this.#renderAppIcons()
     }
 
     /**
      * Method to render the app icons.
      */
-    #renderAppIcons () {
+    async #renderAppIcons () {
+      await import('../app-icon/app-icon')
+
       this.#apps.forEach(app => {
         const appIcon = document.createElement('app-icon')
         appIcon.setAttribute('name', app.name)
@@ -133,14 +136,38 @@ customElements.define('personal-web-desktop',
       const appWindow = document.createElement('app-window')
       appWindow.setAttribute('id', app.id)
       appWindow.setAttribute('name', app.name)
-      appWindow.innerHTML = app.customHtml
-      appWindow.setAttribute('tabindex', '0')
+      appWindow.setAttribute('tabIndex', '0')
+
+      // Create the app content based on the app name
+      let appContent
+
+      if (app.name === 'Kanji Memory Game') {
+        appContent = document.createElement('memory-game')
+      } else if (app.name === 'AI Translator') {
+        appContent = document.createElement('ai-translator')
+      } else if (app.name === 'Language Chat') {
+        appContent = document.createElement('chat-app')
+      }
+
+      // If the app content exists, append it to the app window
+      if (appContent) {
+        appContent.slot = 'app'
+        appWindow.appendChild(appContent)
+      }
+
+      // Add app title and append the app window to the desktop
+      const title = document.createElement('span')
+      title.slot = 'app-title'
+      title.textContent = app.name
+      appWindow.appendChild(title)
+
+      this.#desktopWrapper.appendChild(appWindow)
 
       appWindow.addEventListener('close-app', () => this.#closeSelectedApp(app.id))
       appWindow.addEventListener('click', () => {
         this.#currentApp = appWindow
       })
-      this.#desktopWrapper.appendChild(appWindow)
+
       appWindow.focus()
     }
 
@@ -148,7 +175,7 @@ customElements.define('personal-web-desktop',
      * Method to render the running apps in a window component.
      *
      */
-    #renderRunningApps() {
+    #renderRunningApps () {
       this.#runningApps.forEach(app => {
         this.#renderApp(app)
       })
@@ -159,20 +186,27 @@ customElements.define('personal-web-desktop',
      *
      * @param {string} appName - The name of the app to open.
      */
-    #openSelectedApp (appName) {
+    async #openSelectedApp (appName) {
+      // Lazy load the components
+      await import('../window/window')
       if (appName === 'Kanji Memory') {
+        await import('../memory-game/memory-game')
         // Date.valueOf is used to generate a unique id for the app
-        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game', customHtml: '<memory-game slot="app"></memory-game><span slot="app-title">Kanji Memory Game</span>' }
+        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game' }
         this.#renderApp(memoryApp)
         this.#runningApps.push(memoryApp)
       }
-      if (appName === 'AI Tutor') {
-        const aiTutor = { id: new Date().valueOf(), name: 'AI Tutor', customHtml: '<ai-tutor slot="app"></ai-tutor><span slot="app-title">AI Tutor</span>' }
-        this.#renderApp(aiTutor)
-        this.#runningApps.push(aiTutor)
+      if (appName === 'AI Translator') {
+        await import('../ai-translator/ai-translator')
+
+        const aiTranslator = { id: new Date().valueOf(), name: 'AI Translator' }
+        this.#renderApp(aiTranslator)
+        this.#runningApps.push(aiTranslator)
       }
       if (appName === 'Language Chat') {
-        const chatApp = { id: new Date().valueOf(), name: 'Language Chat', customHtml: '<language-chat slot="app"></language-chat><span slot="app-title">Language Chat</span>' }
+        await import('../messages/messages')
+
+        const chatApp = { id: new Date().valueOf(), name: 'Language Chat' }
         this.#renderApp(chatApp)
         this.#runningApps.push(chatApp)
       }
@@ -192,7 +226,7 @@ customElements.define('personal-web-desktop',
     /**
      * Disconnect event listeners when component is disconnected from DOM.
      */
-    disconnectedCallback() {
+    disconnectedCallback () {
       this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
       this.removeEventListener('close-app', () => this.#closeSelectedApp())
     }
