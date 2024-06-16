@@ -1,1 +1,1 @@
-import './pwd'
+import './pwd.js'

@@ -1,1 +1,1 @@
-import './messages'
+import './messages.js'

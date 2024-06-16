@@ -93,7 +93,7 @@ customElements.define('personal-web-desktop',
       this.#apps = [
         { name: 'Kanji Memory', image: '../../images/kanji9.png' },
         { name: 'AI Translator', image: '../../images/ai-tutor.jpg' },
-        { name: 'Language Chat', image: '../../images/language-exchange.webp' }
+        { name: 'Buddy Chat', image: '../../images/language-exchange.webp' }
       ]
 
       this.#runningApps = []
@@ -136,7 +136,7 @@ customElements.define('personal-web-desktop',
         appContent = document.createElement('memory-game')
       } else if (app.name === 'AI Translator') {
         appContent = document.createElement('ai-translator')
-      } else if (app.name === 'Language Chat') {
+      } else if (app.name === 'Buddy Chat') {
         appContent = document.createElement('chat-app')
       }
 
@@ -196,10 +196,10 @@ customElements.define('personal-web-desktop',
         this.#renderApp(aiTranslator)
         this.#runningApps.push(aiTranslator)
       }
-      if (appName === 'Language Chat') {
+      if (appName === 'Buddy Chat') {
         await import('../messages/messages')
 
-        const chatApp = { id: new Date().valueOf(), name: 'Language Chat' }
+        const chatApp = { id: new Date().valueOf(), name: 'Buddy Chat' }
         this.#renderApp(chatApp)
         this.#runningApps.push(chatApp)
       }
@@ -266,5 +266,6 @@ customElements.define('personal-web-desktop',
     disconnectedCallback () {
       this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
       this.removeEventListener('close-app', () => this.#closeSelectedApp())
+      this.removeEventListener('move-window', (event) => this.#appOutOfBounds(event))
     }
   })

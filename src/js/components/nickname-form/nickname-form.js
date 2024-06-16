@@ -8,7 +8,7 @@
 const template = document.createElement('template')
 template.innerHTML = `
 <form id="nickname-form">
-  <label for="userName" id="userLabel">Enter a nickname:</label><br>
+  <label for="userName" id="userLabel">Enter a nickname to start chatting:</label><br>
   <input type="text" id="userName" name="userName" required><br>
   <button type="submit" class="btn">Enter</button>
 </form>
@@ -59,6 +59,8 @@ customElements.define('nickname-form',
      */
     #nickname
 
+    #nicknameField
+
     /**
      * Constructor for nicknameForm class which invokes its super class constructor.
      */
@@ -72,6 +74,9 @@ customElements.define('nickname-form',
 
       // Get the nickname form element in the shadow root.
       this.#nicknameForm = this.shadowRoot.querySelector('#nickname-form')
+
+      // Get the nickname field in the shadow root.
+      this.#nicknameField = this.shadowRoot.querySelector('#userName')
     }
 
     /**
@@ -82,14 +87,23 @@ customElements.define('nickname-form',
     connectedCallback () {
       // Event handler for the nickname form.
       this.#nicknameForm.addEventListener('submit', (event) => {
-        this.#nickname = this.shadowRoot.querySelector('#userName').value
-        // I want to prevent the browsers default behaviour here, so that the form doesn't submit (and refresh the webpage).
+        this.#nickname = this.#nicknameField.value
+        this.#nicknameField.value = ''
+
+        // I want to prevent the browsers default behaviour here,that the form doesn't submit (and refresh the webpage).
         event.preventDefault()
 
         // Dispatch event for other application to listen to and handle.
-        this.dispatchEvent(new CustomEvent('nickname', {
-          detail: this.#nickname
+        this.dispatchEvent(new CustomEvent('nickname-added', {
+          detail: { username: this.#nickname }
         }))
       })
+    }
+
+    /**
+     * Disconnected callback that is invoked when the element is removed from the DOM.
+     */
+    disconnectedCallback () {
+      this.#nicknameForm.removeEventListener('submit', this.#nickname)
     }
   })

@@ -1,21 +1,22 @@
 // Implement previous nickname component?
 // Escape input for security.
-// Emoji support.
+// Display messages in chat window.
+// Dynamically add messages to chat window.
+// Array to store the messages received and sent so that they can be displayed in the chat window in the correct order, 20 messages have to be visible at a time (scrollable is OK).
 
 import 'emoji-picker-element'
+import '../nickname-form/nickname-form.js'
 
 const template = document.createElement('template')
 template.innerHTML = `
 <main id="chat-app">
-  <h2>Language Exchange Chat</h2>
+  <h2>Chat with your buddies in realtime</h2>
+  <div id="nickname">
+    <!-- Nickname form goes here -->
+  </div>
   <div id="chat-container">
     <div id="chat-window">
-      <div class="message received">
-        <div class="message-content"></div>
-      </div>
-      <div class="message sent">
-        <div class="message-content"></div>
-      </div>
+      <!-- Chat messages go here -->
     </div>
     <form id="chat-form">
       <input type="text" id="message-input" placeholder="Type a message...">
@@ -25,6 +26,24 @@ template.innerHTML = `
 </main>
 
 <style>
+  #chat-app {
+    width: 100%;
+    height: 100%;
+  }
+
+  .btn {
+  font-size: 1.1rem; 
+  background-color: #FF66B3; 
+  color: white; 
+  padding: 5px; 
+  margin-top: 0.5rem; 
+  border-radius: 5px; 
+  }
+
+  .btn:active {
+  background-color: #42BFDD;  
+  }
+
   .hidden {
     display: none;
   }
@@ -40,6 +59,7 @@ customElements.define('chat-app',
     #inputField
     #emojiPicker
     #userName
+    #KEY = 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -55,18 +75,51 @@ customElements.define('chat-app',
 
       // Hide emoji picker when component is loaded.
       this.#emojiPicker.classList.add('hidden')
+
+      // Hide chat window form component is loaded.
+      this.#chatForm.classList.add('hidden')
+    }
+
+    /**
+     * Submit message to server.
+     *
+     * @param {Event} event - The event object.
+     */
+    #submitMessage (event) {
+      event.preventDefault()
+
+      const message = this.#inputField.value
+
+      // Send message to server.
+      const data = {
+        type: 'message',
+        data: message,
+        username: this.#userName,
+        channel: 'Buddy Chat',
+        key: this.#KEY
+      }
+
+      // Send the message to the server.
+      this.#socket.send(JSON.stringify(data))
+
+      // Empty the input field.
+      this.#inputField.value = ''
     }
 
     /**
      * Executed when component has been connected to the DOM.
      */
     connectedCallback () {
-      this.#chatForm.addEventListener('submit', event => {
-        const message = this.shadowRoot.querySelector('#message-input').value
-        console.log('Message: ', message)
-        // Empty the input field.
-        this.#inputField.value = ''
-        event.preventDefault()
+      this.#chatForm.addEventListener('submit', this.#submitMessage.bind(this))
+
+      // Create nickname form component and append it to the shadow root.
+      const nicknameForm = document.createElement('nickname-form')
+      this.shadowRoot.getElementById('nickname').appendChild(nicknameForm)
+
+      nicknameForm.addEventListener('nickname-added', event => {
+        this.#userName = event.detail.username
+        this.#chatForm.classList.remove('hidden')
+        this.shadowRoot.querySelector('#nickname').classList.add('hidden')
       })
 
       // Toggle emoji picker when input field is clicked.
@@ -81,16 +134,7 @@ customElements.define('chat-app',
 
       this.#socket = new window.WebSocket('wss://courselab.lnu.se/message-app/socket', 'charcords')
 
-      const data = {
-        type: 'message',
-        data: 'message',
-        username: 'user',
-        channel: 'Language Exchange Chat',
-        key: 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
-      }
-
       this.#socket.addEventListener('open', () => {
-        this.#socket.send(JSON.stringify(data))
         console.log('Connected to server')
       })
       this.#socket.addEventListener('message', event => {
@@ -105,5 +149,8 @@ customElements.define('chat-app',
     disconnectedCallback () {
       this.#socket.close()
       console.log('Socket connection closed')
+      this.#chatForm.removeEventListener('submit', this.#submitMessage)
+      this.#inputField.removeEventListener('click')
+      this.#emojiPicker.removeEventListener('emoji-click')
     }
   })

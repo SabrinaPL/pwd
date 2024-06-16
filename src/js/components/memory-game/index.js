@@ -1,1 +1,1 @@
-import './memory-game'
+import './memory-game.js'

@@ -1,1 +1,1 @@
-import './app-icon'
+import './app-icon.js'

@@ -1,1 +1,1 @@
-import './flipping-tile'
+import './flipping-tile.js'

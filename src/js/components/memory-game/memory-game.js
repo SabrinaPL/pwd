@@ -1,4 +1,5 @@
 import '../flipping-tile/flipping-tile'
+import '../nickname-form/nickname-form'
 
 const template = document.createElement('template')
 template.innerHTML = ` 
@@ -32,9 +33,7 @@ template.innerHTML = `
     flex-direction: column;
     align-items: center;
     font-size: 20px; 
-    font-weight: medium;
-    width: 100%; 
-    height: 100%; 
+    font-weight: medium; 
   }
 
   .memory-game h1 {

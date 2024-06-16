@@ -1,1 +1,1 @@
-import './ai-translator'
+import './ai-translator.js'
