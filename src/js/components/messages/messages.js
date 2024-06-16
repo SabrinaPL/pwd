@@ -2,6 +2,8 @@
 // Escape input for security.
 // Emoji support.
 
+import 'emoji-picker-element'
+
 const template = document.createElement('template')
 template.innerHTML = `
 <main id="chat-app">
@@ -17,11 +19,16 @@ template.innerHTML = `
     </div>
     <form id="chat-form">
       <input type="text" id="message-input" placeholder="Type a message...">
+      <emoji-picker class="light"></emoji-picker>
       <button type="submit" id="send-button">Send</button>
     </form>
 </main>
 
-<style></style>
+<style>
+  .hidden {
+    display: none;
+  }
+</style>
 `
 customElements.define('chat-app',
   /** Messages class.
@@ -30,6 +37,8 @@ customElements.define('chat-app',
   class extends HTMLElement {
     #socket
     #chatForm
+    #inputField
+    #emojiPicker
     #userName
 
     /**
@@ -41,6 +50,11 @@ customElements.define('chat-app',
       this.shadowRoot.appendChild(template.content.cloneNode(true))
 
       this.#chatForm = this.shadowRoot.querySelector('#chat-form')
+      this.#inputField = this.shadowRoot.querySelector('#message-input')
+      this.#emojiPicker = this.shadowRoot.querySelector('emoji-picker')
+
+      // Hide emoji picker when component is loaded.
+      this.#emojiPicker.classList.add('hidden')
     }
 
     /**
@@ -50,7 +64,19 @@ customElements.define('chat-app',
       this.#chatForm.addEventListener('submit', event => {
         const message = this.shadowRoot.querySelector('#message-input').value
         console.log('Message: ', message)
+        // Empty the input field.
+        this.#inputField.value = ''
         event.preventDefault()
+      })
+
+      // Toggle emoji picker when input field is clicked.
+      this.#inputField.addEventListener('click', () => {
+        this.#emojiPicker.classList.toggle('hidden')
+      })
+
+      // Add emoji to input field when clicked.
+      this.#emojiPicker.addEventListener('emoji-click', event => {
+        this.#inputField.value += event.detail.unicode
       })
 
       this.#socket = new window.WebSocket('wss://courselab.lnu.se/message-app/socket', 'charcords')
