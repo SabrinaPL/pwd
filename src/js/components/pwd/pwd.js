@@ -1,18 +1,5 @@
 // should it be possible to change desktop background? (maybe a settings icon that opens a settings window where the user can change the background image?)
-
-// which responsibilities should the desktop have?
-// display icons
-// display window on click
-// close window on click (desktop listens to close event sent from window)
-// (minimize window on click)
-// move window on click and drag
 // change background image (right click on desktop to open settings window)
-// mac os styling?
-
-// array of applications (app name and icon)
-// another array of currently run applications
-// pros of rendering the icons dynamically: easy to add new applications
-// in the connectedCallback the icons should be rendered dynamically when the desktop is connected to the DOM
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -137,7 +124,8 @@ customElements.define('personal-web-desktop',
      */
     #renderApp (app) {
       const appWindow = document.createElement('app-window')
-      appWindow.setAttribute('id', app.id)
+      const appId = `app-${app.id}`
+      appWindow.setAttribute('id', appId)
       appWindow.setAttribute('name', app.name)
       appWindow.setAttribute('tabIndex', '0')
 
@@ -170,6 +158,7 @@ customElements.define('personal-web-desktop',
       appWindow.addEventListener('click', () => {
         this.#currentApp = appWindow
       })
+      appWindow.addEventListener('move-window', (event) => this.#appOutOfBounds(event))
 
       appWindow.focus()
     }
@@ -225,6 +214,50 @@ customElements.define('personal-web-desktop',
       // Find the app in the running apps array and remove it.
       const appIndex = this.#runningApps.findIndex(app => app.id === windowId)
       this.#runningApps.splice(appIndex, 1)
+    }
+
+    /**
+     * Method to prevent window from moving outside the desktop boundaries.
+     *
+     * @param {*} event - The event object.
+     */
+    #appOutOfBounds (event) {
+      const newLeft = event.detail.newLeft
+      const newTop = event.detail.newTop
+
+      // Get the desktop's bounding rectangle (as suggested by chatGPT).
+      const desktopRect = this.#desktopWrapper.getBoundingClientRect()
+
+      // Select the window that is being moved with the window id.
+      const app = this.shadowRoot.querySelector(`#${event.detail.id}`)
+
+      // Get the window's bounding rectangle.
+      const appRect = app.getBoundingClientRect()
+
+      const windowWidth = appRect.width
+      const windowHeight = appRect.height
+
+      let constrainedLeft = newLeft
+      let constrainedTop = newTop
+
+      // Check if the window is within the desktop's boundaries.
+      // Constrain the new left position.
+      if (constrainedLeft < desktopRect.left) {
+        constrainedLeft = desktopRect.left
+      } else if (constrainedLeft + windowWidth > desktopRect.right) {
+        constrainedLeft = desktopRect.right - windowWidth
+      }
+
+      // Constrain the new top position.
+      if (constrainedTop < desktopRect.top) {
+        constrainedTop = desktopRect.top
+      } else if (constrainedTop + windowHeight > desktopRect.bottom) {
+        constrainedTop = desktopRect.bottom - windowHeight
+      }
+
+      // Update the window's position.
+      app.style.left = `${constrainedLeft}px`
+      app.style.top = `${constrainedTop}px`
     }
 
     /**

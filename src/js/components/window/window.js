@@ -122,14 +122,33 @@ customElements.define('app-window',
      * @param {Event} event - The event object.
      */
     dragWindow (event) {
+      // Get the movement of the mouse.
       const movementX = event.movementX
       const movementY = event.movementY
+
+      // Retrieve the current position of the window by getting the current style of the window.
       const computedStyle = window.getComputedStyle(this)
+
+      // Get the current left and top values of the window as integers.
       const leftValue = parseInt(computedStyle.left)
       const topValue = parseInt(computedStyle.top)
 
+      // Calculate the new position of the window (as suggested chatGPT).
+      const newLeft = leftValue + movementX
+      const newTop = topValue + movementY
+
+      // Set the new position of the window.
       this.style.left = `${leftValue + movementX}px`
       this.style.top = `${topValue + movementY}px`
+
+      // Dispatch an event to notify other components that the window has been moved.
+      this.dispatchEvent(new CustomEvent('move-window', {
+        detail: {
+          id: this.id,
+          newLeft,
+          newTop
+        }
+      }))
     }
 
     /**

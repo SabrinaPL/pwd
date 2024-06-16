@@ -4,14 +4,14 @@ This is a custom HTML component that represents an app icon. The component displ
 
 ## Table of Contents
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Attributes](#attributes)
-- [Events](#events)
-- [Customization](#customization)
-- [Contributing](#contributing)
-- [License](#license)
+- [Features] (#features)
+- [Installation] (#installation)
+- [Usage] (#usage)
+- [Attributes] (#attributes)
+- [Events] (#events)
+- [Customization] (#customization)
+- [Contributing] (#contributing)
+- [License] (#license)
 
 ## Features
 
