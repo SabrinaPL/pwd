@@ -1,18 +1,12 @@
-// which responsibilities should the window have?
-// Window size
-// Window close functionality
-// (Window minimize functionality)
-// Window move/draggable functionality (send event to desktop when window is moved)
-// Window styling
-// Window should be able to display any component that is passed to it
-// Window should be able to be created with a title, a component, and a position
-
 const template = document.createElement('template')
 template.innerHTML = `
   <div id="app-window">
     <div id="window-header">
       <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
-      <button id="close-window">X</button>
+      <div group="window-btns">
+        <button id="minimalize-window">-</button>
+        <button id="close-window">X</button>
+      </div>
     </div>
     <div id="app-component">
       <slot name="app"><!-- app component goes here --></slot>
@@ -55,13 +49,21 @@ template.innerHTML = `
       padding: 1rem;
     }
 
+    #close-window, #minimalize-window {
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    }
+
     #close-window {
       background-color: red;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
+    }
+
+    #minimalize-window {
+      font-weight: bold;
+      background-color: white;
     }
 
   </style>
@@ -94,6 +96,7 @@ customElements.define('app-window',
      */
     connectedCallback () {
       this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
+      this.shadowRoot.querySelector('#minimalize-window').addEventListener('click', () => this.minimalizeWindow())
       this.shadowRoot.querySelector('#window-header').addEventListener('mousedown', (event) => {
         this.addEventListener('mousemove', this.dragWindow)
       })
@@ -129,10 +132,14 @@ customElements.define('app-window',
       this.style.top = `${topValue + movementY}px`
     }
 
-    changeWindowSize () {
-    }
-
+    /**
+     * Method to minimalize the window.
+     */
     minimalizeWindow () {
+      this.setAttribute('style', 'display: none')
+      this.dispatchEvent(new CustomEvent('minimalize-app', {
+        detail: this.id
+      }))
     }
 
     /**

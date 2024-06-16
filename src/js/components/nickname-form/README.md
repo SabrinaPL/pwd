@@ -9,4 +9,4 @@ Is triggered when the user submits their nickname through the form.
 
 ## Styling
 
-The Nickname Form Web Component includes default styling for the form elements and the "Let's play!" button.
+The Nickname Form Web Component includes default styling for the form elements and the "Enter" button.

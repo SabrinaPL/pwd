@@ -61,14 +61,6 @@ The component dispatches a custom event when the icon is clicked:
 
 - `openApp`: Fired when the app icon is clicked. The event's detail includes the app name.
 
-Example of handling the event:
-
-```javascript
-document.querySelector('app-icon').addEventListener('openApp', (event) => {
-  console.log('App opened:', event.detail.app);
-});
-```
-
 ## Customization
 
 You can customize the styles of the component by modifying the CSS within the `<style>` tag in the JavaScript file.

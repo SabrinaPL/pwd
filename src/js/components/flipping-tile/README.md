@@ -62,14 +62,6 @@ The component dispatches a custom event when the tile is flipped:
 
 - `tile-is-flipped`: Fired when the tile is flipped. The event's detail includes the flipped tile element.
 
-Example of handling the event:
-
-```javascript
-document.querySelector('flipping-tile').addEventListener('tile-is-flipped', (event) => {
-  console.log('Tile flipped:', event.detail.tile);
-});
-```
-
 ## Customization
 
 You can customize the styles of the component by modifying the CSS within the `<style>` tag in the JavaScript file.

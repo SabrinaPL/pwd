@@ -18,10 +18,13 @@ const template = document.createElement('template')
 template.innerHTML = `
   <main id="pwd">
   <div id="desktop-wrapper">
+      <!-- app windows should be rendered here -->
+    <div id="topbar">
+      <!-- running apps should be rendered here -->
+    </div>
     <div id="apps-container">
       <!-- app icons should be rendered here -->
     </div>
-      <!-- app window should be rendered here -->
   </div>
   </main>
 
@@ -53,7 +56,7 @@ template.innerHTML = `
       transform: translateX(-50%);
       background-color: rgba(255,255,255,0.5);
       border-radius: 10px;
-      padding: 1.5rem;
+      padding: 1rem;
       min-width: 50%;
       justify-content: center;
     }
@@ -177,6 +180,7 @@ customElements.define('personal-web-desktop',
      */
     #renderRunningApps () {
       this.#runningApps.forEach(app => {
+        this.shadowRoot.querySelector('#topbar').innerHTML = ''
         this.#renderApp(app)
       })
     }

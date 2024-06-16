@@ -8,17 +8,17 @@
 const template = document.createElement('template')
 template.innerHTML = `
 <form id="nickname-form">
-  <label for="playerName" id="playerLabel">Enter a nickname:</label><br>
-  <input type="text" id="playerName" name="playerName" required><br>
+  <label for="userName" id="userLabel">Enter a nickname:</label><br>
+  <input type="text" id="userName" name="userName" required><br>
   <button type="submit" class="btn">Enter</button>
 </form>
 
 <style>
-#playerLabel {
+#userLabel {
   font-size: 1.3rem; 
 }
 
-#playerName {
+#userName {
   font-size: 1rem; 
   margin-top: 0.5rem; 
   margin-bottom: 0.5rem; 
@@ -82,11 +82,11 @@ customElements.define('nickname-form',
     connectedCallback () {
       // Event handler for the nickname form.
       this.#nicknameForm.addEventListener('submit', (event) => {
-        this.#nickname = this.shadowRoot.querySelector('#playerName').value
+        this.#nickname = this.shadowRoot.querySelector('#userName').value
         // I want to prevent the browsers default behaviour here, so that the form doesn't submit (and refresh the webpage).
         event.preventDefault()
 
-        // Dispatch event for quiz-application to listen to and handle.
+        // Dispatch event for other application to listen to and handle.
         this.dispatchEvent(new CustomEvent('nickname', {
           detail: this.#nickname
         }))
