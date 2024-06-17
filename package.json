@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "start": "nodemon api/server.js",
     "lint": "npx eslint ./src || exit 0",
     "lint:fix": "npx eslint ./src --fix || exit 0"
   },
@@ -23,7 +24,12 @@
     "vite": "^4.4.9"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "deepl-node": "^1.13.0",
     "dompurify": "^3.1.5",
-    "emoji-picker-element": "^1.21.3"
+    "emoji-picker-element": "^1.21.3",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "nodemon": "^3.1.3"
   }
 }

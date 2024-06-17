@@ -5,8 +5,8 @@ template.innerHTML = `
     <div part="front-of-tile">
       <img src="" id="front-of-card" alt="kanji image on the front of the card" /><!-- random kanji image will be rendered here -->
     </div>
-    <div part="back-of-tile">
-      <img src="" id="back-of-card" alt="kanji image on the back of the card" /><!-- set the back of the tile image dynamically -->
+    <div part="back-of-tile" id="back-of-card">
+      <!-- <img src="" id="back-of-card" alt="kanji image on the back of the card" /> --><!-- set the back of the tile image dynamically -->
     </div>
   </div>
   </div>
@@ -34,6 +34,7 @@ template.innerHTML = `
 
     ::part(front-of-tile), 
     ::part(back-of-tile) {
+      display: flex;
       height: 100%;
       width: 100%;
       position: absolute;
@@ -53,6 +54,13 @@ template.innerHTML = `
 
     ::part(back-of-tile) { 
       background-color: red;
+      background-size: contain;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .flipping-tile.is-flipped #wrapper {
@@ -120,10 +128,14 @@ customElements.define('flipping-tile',
      */
     attributeChangedCallback (name, oldValue, newValue) {
       if (name === 'image-front') {
-        this.querySelector('#front-of-card').src = newValue
+        this.shadowRoot.querySelector('#front-of-card').src = newValue
       } else if (name === 'image-back') {
-        this.querySelector('#back-of-card').src = newValue
+        this.shadowRoot.querySelector('#back-of-card').style.backgroundImage = `url(${newValue})`
       }
+    }
+
+    static get observedAttributes () {
+      return ['image-front', 'image-back']
     }
 
     /**
@@ -132,6 +144,7 @@ customElements.define('flipping-tile',
      * @param {HTMLElement} tile - The tile to be flipped and disabled.
      */
     #flipTile (tile) {
+      // Find a way to access that div element (from the memory game) and add a class to it to flip the card.
       tile.classList.add('is-flipped')
 
       /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
@@ -139,9 +152,7 @@ customElements.define('flipping-tile',
 
       /* I want to communicate to the memory game component that a tile has been flipped and dispatch the flipped tile element so that it can be compared to the previously flipped tile. */
       const tileFlippedEvent = new CustomEvent('tile-is-flipped', {
-        detail: {
-          tile
-        }
+        detail: this
       })
       this.dispatchEvent(tileFlippedEvent)
     }
@@ -156,6 +167,11 @@ customElements.define('flipping-tile',
       frontOfTile.innerHTML = `<img src=${image} alt="kanji image" />`
     }
 
+    /**
+     * Method to dynamically render the image on the back of the tile.
+     *
+     * @param {*} image - The image to be rendered on the back of the tile.
+     */
     #renderBackOfTile (image) {
       const backOfTile = this.shadowRoot.querySelector('slot[name="back"]')
       backOfTile.innerHTML = `<img src=${image} alt="back of card" />`
@@ -168,8 +184,8 @@ customElements.define('flipping-tile',
     disconnectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.removeEventListener('click', () => this.#flipTile(tile))
-      tile.removeEventListener('render-front-of-tile', (e) => {
-        this.#renderFrontOfTile(e.detail.image)
+      tile.removeEventListener('render-front-of-tile', (event) => {
+        this.#renderFrontOfTile(event.detail.image)
       })
     }
   })

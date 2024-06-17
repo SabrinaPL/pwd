@@ -27,6 +27,10 @@ template.innerHTML = `
 <div>
 
 <style>
+  .memory-game {
+    background-color: red;
+  }
+
   .memory-game,
   #start-game-info {
     display: flex; 
@@ -77,8 +81,7 @@ customElements.define('memory-game',
     #difficultyBtns
     #columns
     #rows
-    #selectedTile
-    #tile
+    #previouslySelectedTile
     #numOfTries
     #memorycards
 
@@ -117,7 +120,7 @@ customElements.define('memory-game',
     }
 
     /**
-     * 
+     * Method to set up the memory cards array with the images that will be rendered to the front of the tiles.
      */
     #setupMemoryCards () {
       // We need to know how many cards we need to create.
@@ -154,11 +157,12 @@ customElements.define('memory-game',
       // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
       for (let i = 0; i < this.#columns * this.#rows; i++) {
         const flippingTile = document.createElement('flipping-tile')
-        flippingTile.setAttribute('src', this.#memorycards[i])
+        flippingTile.setAttribute('image-front', this.#memorycards[i])
+        flippingTile.setAttribute('image-back', './images/back-of-card.png')
 
         /* I want to listen to when a tile has been flipped so that I can invoke the method that is responsible for the game logic. */
-        flippingTile.addEventListener('tile-is-flipped', (e) => {
-          this.#checkFlippedCards(e.detail.tile)
+        flippingTile.addEventListener('tile-is-flipped', (event) => {
+          this.#checkFlippedCards(event.detail)
         })
 
         this.#memoryGameBoard.append(flippingTile)
@@ -183,17 +187,19 @@ customElements.define('memory-game',
      * @param {HTMLElement} tile - The tile that has been flipped.
      */
     #checkFlippedCards (tile) {
-      if (!this.#tile) {
-        this.#tile = tile
+      console.log(tile.getAttribute('image-front'))
+
+      if (!this.#previouslySelectedTile) {
+        this.#previouslySelectedTile = tile
       } else {
-        if (this.#tile.isEqualNode(tile)) {
+        if (this.#previouslySelectedTile.getAttribute('image-front') === tile.getAttribute('image-front')) {
           tile.classList.add('is-hidden')
-          this.#tile.classList.add('is-hidden')
-          this.#tile = null
+          this.#previouslySelectedTile.classList.add('is-hidden')
+          this.#previouslySelectedTile = null
         } else {
           tile.classList.remove('is-flipped')
-          this.#tile.classList.remove('is-flipped')
-          this.#tile = null
+          this.#previouslySelectedTile.classList.remove('is-flipped')
+          this.#previouslySelectedTile = null
         }
 
         /* To keep track of number of tries, regardless of if there is a match or not */
