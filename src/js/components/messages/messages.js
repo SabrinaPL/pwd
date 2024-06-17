@@ -6,6 +6,7 @@
 
 import 'emoji-picker-element'
 import '../nickname-form/nickname-form.js'
+import DOMPurify from 'dompurify'
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -20,8 +21,8 @@ template.innerHTML = `
     </div>
     <form id="chat-form">
       <input type="text" id="message-input" placeholder="Type a message...">
-      <emoji-picker class="light"></emoji-picker>
       <button type="submit" id="send-button">Send</button>
+      <emoji-picker class="light"></emoji-picker>
     </form>
 </main>
 
@@ -76,8 +77,22 @@ customElements.define('chat-app',
       // Hide emoji picker when component is loaded.
       this.#emojiPicker.classList.add('hidden')
 
-      // Hide chat window form component is loaded.
-      this.#chatForm.classList.add('hidden')
+      // Check if there is already a username stored in local storage.
+      if (localStorage.getItem('username') === null || localStorage.getItem('username') === undefined) {
+        // Hide chat window form component.
+        this.#chatForm.classList.add('hidden')
+      } else {
+        // Set the username.
+        this.#userName = JSON.parse(localStorage.getItem('username'))
+
+        // Welcome the user.
+        const welcomeMessage = document.createElement('p')
+        welcomeMessage.textContent = `Welcome back ${this.#userName}!`
+        this.shadowRoot.querySelector('#chat-window').appendChild(welcomeMessage)
+
+        // Show chat window form component.
+        this.#chatForm.classList.remove('hidden')
+      }
     }
 
     /**
@@ -90,10 +105,15 @@ customElements.define('chat-app',
 
       const message = this.#inputField.value
 
+      // Purify the input from potentially harmful html before sending it to the server (to prevent XSS-attacks).
+      const cleanedMessage = DOMPurify(message)
+
+      console.log(this.#userName)
+
       // Send message to server.
       const data = {
         type: 'message',
-        data: message,
+        data: cleanedMessage,
         username: this.#userName,
         channel: 'Buddy Chat',
         key: this.#KEY
@@ -112,15 +132,25 @@ customElements.define('chat-app',
     connectedCallback () {
       this.#chatForm.addEventListener('submit', this.#submitMessage.bind(this))
 
-      // Create nickname form component and append it to the shadow root.
-      const nicknameForm = document.createElement('nickname-form')
-      this.shadowRoot.getElementById('nickname').appendChild(nicknameForm)
+      if (localStorage.getItem('username') === null || localStorage.getItem('username') === undefined) {
+        // Create nickname form component and append it to the shadow root.
+        const nicknameForm = document.createElement('nickname-form')
+        this.shadowRoot.getElementById('nickname').appendChild(nicknameForm)
 
-      nicknameForm.addEventListener('nickname-added', event => {
-        this.#userName = event.detail.username
-        this.#chatForm.classList.remove('hidden')
-        this.shadowRoot.querySelector('#nickname').classList.add('hidden')
-      })
+        nicknameForm.addEventListener('nickname-added', event => {
+          // Store the username in local storage.
+          localStorage.setItem('username', JSON.stringify(event.detail.username))
+
+          // Set the username.
+          this.#userName = event.detail.username
+
+          // Show chat window form component.
+          this.#chatForm.classList.remove('hidden')
+
+          // Hide nickname form component.
+          this.shadowRoot.querySelector('#nickname').classList.add('hidden')
+        })
+      }
 
       // Toggle emoji picker when input field is clicked.
       this.#inputField.addEventListener('click', () => {
