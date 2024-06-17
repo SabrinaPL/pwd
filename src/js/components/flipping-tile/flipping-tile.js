@@ -151,7 +151,7 @@ customElements.define('flipping-tile',
     }
 
     /**
-     * Method to flip and disable a tile.
+     * Method to flip a tile.
      *
      * @param {HTMLElement} tile - The tile to be flipped and disabled.
      */
@@ -163,6 +163,27 @@ customElements.define('flipping-tile',
         detail: this
       })
       this.dispatchEvent(tileFlippedEvent)
+    }
+
+    /**
+     * Method to flip a tile back.
+     */
+    flipBack () {
+      this.shadowRoot.querySelector('.flipping-tile').classList.remove('is-flipped')
+    }
+
+    /**
+     * Method to disable a tile.
+     */
+    disable () {
+      this.shadowRoot.querySelector('.flipping-tile').classList.add('is-disabled')
+    }
+
+    /**
+     * Method to hide a tile.
+     */
+    hide () {
+      this.shadowRoot.querySelector('.flipping-tile').classList.add('is-hidden')
     }
 
     /**

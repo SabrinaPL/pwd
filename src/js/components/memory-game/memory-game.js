@@ -93,6 +93,7 @@ customElements.define('memory-game',
     #memorycards
     #nicknameForm
     #playerName
+    #comparingTiles
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -110,6 +111,8 @@ customElements.define('memory-game',
      */
     connectedCallback () {
       this.#startGameInfo = this.shadowRoot.querySelector('#start-game-info')
+
+      this.#comparingTiles = false
 
       // Present the nickname form to the user.
       this.#nicknameForm = document.createElement('nickname-form')
@@ -215,14 +218,17 @@ customElements.define('memory-game',
       } else {
         // If there is a previously selected tile, compare the two tiles.
         if (this.#previouslySelectedTile.getAttribute('image-front') === tile.getAttribute('image-front')) {
-          tile.classList.add('is-hidden')
-          this.#previouslySelectedTile.classList.add('is-hidden')
+          tile.hide()
+          this.#previouslySelectedTile.hide()
           this.#previouslySelectedTile = null
         } else {
           // If the tiles do not match, flip the tiles back.
-          tile.classList.remove('is-flipped')
-          this.#previouslySelectedTile.classList.remove('is-flipped')
-          this.#previouslySelectedTile = null
+          setTimeout(() => {
+            tile.flipBack()
+            this.#previouslySelectedTile.flipBack()
+            // Reset the previously selected tile to null so that the next pair of tiles can be compared.
+            this.#previouslySelectedTile = null
+          }, 1200)
         }
 
         /* To keep track of number of tries, regardless of if there is a match or not */
