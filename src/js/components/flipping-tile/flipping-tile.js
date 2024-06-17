@@ -3,9 +3,10 @@ template.innerHTML = `
   <div class="flipping-tile">
   <div id="wrapper">
     <div part="front-of-tile">
-      <slot name="front"><!-- random kanji image will be rendered here --></slot>
+      <img src="" id="front-of-card" alt="kanji image on the front of the card" /><!-- random kanji image will be rendered here -->
     </div>
     <div part="back-of-tile">
+      <img src="" id="back-of-card" alt="kanji image on the back of the card" /><!-- set the back of the tile image dynamically -->
     </div>
   </div>
   </div>
@@ -52,7 +53,6 @@ template.innerHTML = `
 
     ::part(back-of-tile) { 
       background-color: red;
-      background-image: url('../../images/back-of-card.png');
     }
 
     .flipping-tile.is-flipped #wrapper {
@@ -112,6 +112,21 @@ customElements.define('flipping-tile',
     }
 
     /**
+     * Method to observe changes to the image-front and image-back attributes.
+     *
+     * @param {*} name - The name of the attribute being observed.
+     * @param {*} oldValue - The previous value of the attribute.
+     * @param {*} newValue - The new value of the attribute.
+     */
+    attributeChangedCallback (name, oldValue, newValue) {
+      if (name === 'image-front') {
+        this.querySelector('#front-of-card').src = newValue
+      } else if (name === 'image-back') {
+        this.querySelector('#back-of-card').src = newValue
+      }
+    }
+
+    /**
      * Method to flip and disable a tile.
      *
      * @param {HTMLElement} tile - The tile to be flipped and disabled.
@@ -137,9 +152,13 @@ customElements.define('flipping-tile',
      * @param {string} image - The image to be rendered on the front of the tile.
      */
     #renderFrontOfTile (image) {
-      console.log(image)
       const frontOfTile = this.shadowRoot.querySelector('slot[name="front"]')
       frontOfTile.innerHTML = `<img src=${image} alt="kanji image" />`
+    }
+
+    #renderBackOfTile (image) {
+      const backOfTile = this.shadowRoot.querySelector('slot[name="back"]')
+      backOfTile.innerHTML = `<img src=${image} alt="back of card" />`
     }
 
     /**

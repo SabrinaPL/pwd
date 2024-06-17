@@ -21,6 +21,7 @@ template.innerHTML = `
     </div>
     <form id="chat-form">
       <input type="text" id="message-input" placeholder="Type a message...">
+      <button type="emoji" id="emoji-button">😀</button>
       <button type="submit" id="send-button">Send</button>
       <emoji-picker class="light"></emoji-picker>
     </form>
@@ -58,6 +59,7 @@ customElements.define('chat-app',
     #socket
     #chatForm
     #inputField
+    #emojiBtn
     #emojiPicker
     #userName
     #KEY = 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
@@ -73,6 +75,7 @@ customElements.define('chat-app',
       this.#chatForm = this.shadowRoot.querySelector('#chat-form')
       this.#inputField = this.shadowRoot.querySelector('#message-input')
       this.#emojiPicker = this.shadowRoot.querySelector('emoji-picker')
+      this.#emojiBtn = this.shadowRoot.querySelector('#emoji-button')
 
       // Hide emoji picker when component is loaded.
       this.#emojiPicker.classList.add('hidden')
@@ -143,9 +146,7 @@ customElements.define('chat-app',
       if (data.username === 'Server' || data.username === 'The Server') {
         // Ignore the messages from the server.
         return
-      }
-
-      if (data.username === this.#userName) {
+      } else if (data.username === this.#userName) {
         // Ignore the messages from the user.
         return
       }
@@ -187,12 +188,13 @@ customElements.define('chat-app',
         })
       }
 
-      // Toggle emoji picker when input field is clicked.
-      this.#inputField.addEventListener('click', () => {
+      // Toggle emoji picker when emoji button is clicked.
+      this.#emojiBtn.addEventListener('click', (event) => {
+        event.preventDefault()
         this.#emojiPicker.classList.toggle('hidden')
       })
 
-      // Add emoji to input field when clicked.
+      // Add emoji to field when clicked.
       this.#emojiPicker.addEventListener('emoji-click', event => {
         this.#inputField.value += event.detail.unicode
       })
@@ -217,5 +219,6 @@ customElements.define('chat-app',
       this.#chatForm.removeEventListener('submit', this.#submitMessage)
       this.#inputField.removeEventListener('click')
       this.#emojiPicker.removeEventListener('emoji-click')
+      this.#emojiBtn.removeEventListener('click')
     }
   })

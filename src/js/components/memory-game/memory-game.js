@@ -104,8 +104,7 @@ customElements.define('memory-game',
       this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
 
       this.#numOfTries = 0
-
-      this.#memorycards = ['../../images/kanji1.png', '../../images/kanji2.png', '../../images/kanji3.png', '../../images/kanji4.png', '../../images/kanji5.png', '../../images/kanji6.png', '../../images/kanji7.png', '../../images/kanji8.png', '../../images/kanji9.png'] // <-- Should the images be duplicated here?
+      this.#memorycards = []
 
       // Loop through the radio buttons and add event listeners that listen to when the user selects a radio button (so that the grid size can be rendered dynamically).
       this.#difficultyBtns.forEach(btn => {
@@ -115,6 +114,21 @@ customElements.define('memory-game',
           this.#renderMemoryGameBoard()
         })
       })
+    }
+
+    /**
+     * 
+     */
+    #setupMemoryCards () {
+      // We need to know how many cards we need to create.
+      const amountOfCards = this.#rows * this.#columns / 2
+
+      // Create an array with the amount of cards we need to create.
+      for (let i = 1; i <= amountOfCards; i++) {
+        // Push the image to the memory cards array twice so that each image has a matching pair.
+        this.#memorycards.push(`./images/kanji${i}.png`)
+        this.#memorycards.push(`./images/kanji${i}.png`)
+      }
     }
 
     /**
@@ -131,14 +145,16 @@ customElements.define('memory-game',
       this.#memoryGameBoard.style.gridTemplateColumns = `repeat(${this.#columns}, 1fr)`
       this.#memoryGameBoard.style.gridTemplateRows = `repeat(${this.#rows}, 1fr)`
 
+      // Set up the memory cards array with the images that will be rendered to the front of the tiles.
+      this.#setupMemoryCards()
+
       // Shuffle the images that will be rendered to the front of tiles.
       this.#shuffleImages()
 
       // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
       for (let i = 0; i < this.#columns * this.#rows; i++) {
         const flippingTile = document.createElement('flipping-tile')
-
-        // Dispatch event to render the front of the tile with the image? Or setAttribute?
+        flippingTile.setAttribute('src', this.#memorycards[i])
 
         /* I want to listen to when a tile has been flipped so that I can invoke the method that is responsible for the game logic. */
         flippingTile.addEventListener('tile-is-flipped', (e) => {
