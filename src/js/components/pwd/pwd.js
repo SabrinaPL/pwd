@@ -1,6 +1,3 @@
-// should it be possible to change desktop background? (maybe a settings icon that opens a settings window where the user can change the background image?)
-// change background image (right click on desktop to open settings window)
-
 /**
  * The pwd component module.
  *
@@ -13,9 +10,6 @@ template.innerHTML = `
   <main id="pwd">
   <div id="desktop-wrapper">
       <!-- app windows should be rendered here -->
-    <div id="topbar">
-      <!-- running apps should be rendered here -->
-    </div>
     <div id="apps-container">
       <!-- app icons should be rendered here -->
     </div>
@@ -78,6 +72,7 @@ customElements.define('personal-web-desktop',
     #desktopWrapper
     #runningApps
     #currentApp
+    #desktopBackgrounds
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -98,9 +93,19 @@ customElements.define('personal-web-desktop',
       this.#desktopWrapper = this.shadowRoot.querySelector('#desktop-wrapper')
       this.#appsContainer = this.shadowRoot.querySelector('#apps-container')
       this.#pwd = this.shadowRoot.querySelector('#pwd')
+      this.#desktopBackgrounds = []
 
-      // Set the desktop background image.
-      this.#pwd.style.backgroundImage = `url(${this.#generatePath('desktop-background.jpg')})`
+      // Generate desktop background images.
+      for (let i = 0; i <= 6; i++) {
+        this.#desktopBackgrounds.push(`desktop-background${i}.jpg`)
+      }
+
+      // Set the desktop background image and change it on right click.
+      this.#pwd.style.backgroundImage = `url(${this.#generatePath(this.#desktopBackgrounds[0])})`
+      this.#pwd.addEventListener('contextmenu', (event) => {
+        event.preventDefault()
+        this.#changeBackground()
+      })
 
       this.#apps = [
         { name: 'Kanji Memory', image: this.#generatePath('kanji9.png') },
@@ -176,14 +181,14 @@ customElements.define('personal-web-desktop',
     }
 
     /**
-     * Method to render the running apps in a window component.
-     *
+     * Method to randomly change the desktop background image.
      */
-    #renderRunningApps () {
-      this.#runningApps.forEach(app => {
-        this.shadowRoot.querySelector('#topbar').innerHTML = ''
-        this.#renderApp(app)
-      })
+    #changeBackground () {
+      // Set a new random background image.
+      const nextBackground = this.#desktopBackgrounds[Math.floor(Math.random() * this.#desktopBackgrounds.length + 1)]
+
+      // Set the new background image
+      this.#pwd.style.backgroundImage = `url(${this.#generatePath(nextBackground)})`
     }
 
     /**

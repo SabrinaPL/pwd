@@ -11,7 +11,6 @@ template.innerHTML = `
     <div id="window-header">
       <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
       <div group="window-btns">
-        <button id="minimalize-window">-</button>
         <button id="close-window">X</button>
       </div>
     </div>
@@ -68,11 +67,6 @@ template.innerHTML = `
       background-color: red;
     }
 
-    #minimalize-window {
-      font-weight: bold;
-      background-color: white;
-    }
-
   </style>
 `
 
@@ -103,7 +97,6 @@ customElements.define('app-window',
      */
     connectedCallback () {
       this.shadowRoot.querySelector('#close-window').addEventListener('click', () => this.#closeWindow())
-      this.shadowRoot.querySelector('#minimalize-window').addEventListener('click', () => this.minimalizeWindow())
       this.shadowRoot.querySelector('#window-header').addEventListener('mousedown', (event) => {
         this.addEventListener('mousemove', this.dragWindow)
       })
@@ -155,16 +148,6 @@ customElements.define('app-window',
           newLeft,
           newTop
         }
-      }))
-    }
-
-    /**
-     * Method to minimalize the window.
-     */
-    minimalizeWindow () {
-      this.setAttribute('style', 'display: none')
-      this.dispatchEvent(new CustomEvent('minimalize-app', {
-        detail: this.id
       }))
     }
 
