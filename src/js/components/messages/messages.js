@@ -108,19 +108,18 @@ customElements.define('chat-app',
       // Purify the input from potentially harmful html before sending it to the server (to prevent XSS-attacks).
       const cleanedMessage = DOMPurify.sanitize(message)
 
-      console.log(this.#userName)
-
       // Send message to server.
       const data = {
         type: 'message',
         data: cleanedMessage,
         username: this.#userName,
-        channel: 'Buddy Chat',
+        channel: 'my, not so secret, channel',
         key: this.#KEY
       }
 
       // Append the message to the chat window.
       const messageElement = document.createElement('p')
+      messageElement.setAttribute('id', 'user-message')
       messageElement.textContent = `${this.#userName}: ${cleanedMessage}`
       this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
 
@@ -129,6 +128,37 @@ customElements.define('chat-app',
 
       // Empty the input field.
       this.#inputField.value = ''
+    }
+
+    /**
+     * Method to receive message from server.
+     *
+     * @param {*} event - The event object.
+     */
+    #receiveMessage (event) {
+      const data = JSON.parse(event.data)
+
+      console.log(data)
+
+      if (data.username === 'Server' || data.username === 'The Server') {
+        // Ignore the messages from the server.
+        return
+      }
+
+      if (data.username === this.#userName) {
+        // Ignore the messages from the user.
+        return
+      }
+
+      // Purify the input from potentially harmful html before appending it to the chat window (to prevent XSS-attacks).
+      const cleanedMessage = DOMPurify.sanitize(data.data)
+      const cleanedUsername = DOMPurify.sanitize(data.username)
+
+      // Append the message to the chat window.
+      const messageElement = document.createElement('p')
+      messageElement.setAttribute('id', 'reply-message')
+      messageElement.textContent = `${cleanedUsername}: ${cleanedMessage}`
+      this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
     }
 
     /**
@@ -173,7 +203,7 @@ customElements.define('chat-app',
         console.log('Connected to server')
       })
       this.#socket.addEventListener('message', event => {
-        console.log('Message from server: ', event.data)
+        this.#receiveMessage(event)
       }
       )
     }
