@@ -8,7 +8,7 @@
 const template = document.createElement('template')
 template.innerHTML = `
 <form id="nickname-form">
-  <label for="userName" id="userLabel">Enter a nickname to start chatting:</label><br>
+  <label for="userName" id="userLabel">Enter a nickname to start:</label><br>
   <input type="text" id="userName" name="userName" required><br>
   <button type="submit" class="btn">Enter</button>
 </form>
@@ -26,7 +26,7 @@ template.innerHTML = `
 
 .btn {
 font-size: 1.1rem; 
-background-color: #FF66B3; 
+background-color: #011627;
 color: white; 
 padding: 5px; 
 margin-top: 0.5rem; 
@@ -34,7 +34,7 @@ border-radius: 5px;
 }
 
 .btn:active {
-background-color: #42BFDD;  
+background-color: #628395;  
 }
 </style>
 `

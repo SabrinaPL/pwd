@@ -1,3 +1,10 @@
+/**
+ * The memory game component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
+
 import '../flipping-tile/flipping-tile'
 import '../nickname-form/nickname-form'
 
@@ -8,7 +15,7 @@ template.innerHTML = `
     <p>Try to find all matching pairs of 漢字 (kanji)</p>
 
 <div id="start-game-info">
-    <p>Choose game difficulty to start the game:</p>
+    <p>Choose game difficulty:</p>
     <div class="difficulty-buttons">
 
       <!-- The data-columns and data-rows attributes are used to dynamically set the number of columns and rows in the memory game board. -->
@@ -84,6 +91,8 @@ customElements.define('memory-game',
     #previouslySelectedTile
     #numOfTries
     #memorycards
+    #nicknameForm
+    #playerName
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -102,6 +111,10 @@ customElements.define('memory-game',
     connectedCallback () {
       this.#startGameInfo = this.shadowRoot.querySelector('#start-game-info')
 
+      // Present the nickname form to the user.
+      this.#nicknameForm = document.createElement('nickname-form')
+      this.#startGameInfo.append(this.#nicknameForm)
+
       this.#memoryGameBoard = this.shadowRoot.querySelector('#memory-game-board')
 
       this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
@@ -114,8 +127,17 @@ customElements.define('memory-game',
         btn.addEventListener('change', () => {
           this.#columns = btn.dataset.columns
           this.#rows = btn.dataset.rows
-          this.#renderMemoryGameBoard()
         })
+      })
+
+      this.#nicknameForm.addEventListener('nickname-added', (event) => {
+        this.#playerName = event.detail.username
+        this.#startGameInfo.classList.remove('is-hidden')
+
+        // Check if the user has selected a difficulty level and render the memory game board.
+        if (this.#columns && this.#rows) {
+          this.#renderMemoryGameBoard()
+        }
       })
     }
 
@@ -187,16 +209,17 @@ customElements.define('memory-game',
      * @param {HTMLElement} tile - The tile that has been flipped.
      */
     #checkFlippedCards (tile) {
-      console.log(tile.getAttribute('image-front'))
-
       if (!this.#previouslySelectedTile) {
+        // If there is no previously selected tile, set the current tile as the previously selected tile.
         this.#previouslySelectedTile = tile
       } else {
+        // If there is a previously selected tile, compare the two tiles.
         if (this.#previouslySelectedTile.getAttribute('image-front') === tile.getAttribute('image-front')) {
           tile.classList.add('is-hidden')
           this.#previouslySelectedTile.classList.add('is-hidden')
           this.#previouslySelectedTile = null
         } else {
+          // If the tiles do not match, flip the tiles back.
           tile.classList.remove('is-flipped')
           this.#previouslySelectedTile.classList.remove('is-flipped')
           this.#previouslySelectedTile = null

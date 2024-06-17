@@ -1,8 +1,9 @@
-// Implement previous nickname component?
-// Escape input for security.
-// Display messages in chat window.
-// Dynamically add messages to chat window.
-// Array to store the messages received and sent so that they can be displayed in the chat window in the correct order, 20 messages have to be visible at a time (scrollable is OK).
+/**
+ * The memory game component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
 
 import 'emoji-picker-element'
 import '../nickname-form/nickname-form.js'
@@ -60,6 +61,7 @@ customElements.define('chat-app',
     #socket
     #chatForm
     #inputField
+    #messages
     #emojiBtn
     #emojiPicker
     #userName
@@ -77,6 +79,8 @@ customElements.define('chat-app',
       this.#inputField = this.shadowRoot.querySelector('#message-input')
       this.#emojiPicker = this.shadowRoot.querySelector('emoji-picker')
       this.#emojiBtn = this.shadowRoot.querySelector('#emoji-button')
+
+      this.#messages = []
 
       // Hide emoji picker when component is loaded.
       this.#emojiPicker.classList.add('hidden')
@@ -112,7 +116,7 @@ customElements.define('chat-app',
       // Purify the input from potentially harmful html before sending it to the server (to prevent XSS-attacks).
       const cleanedMessage = DOMPurify.sanitize(message)
 
-      // Send message to server.
+      // Prepare data to send to the server.
       const data = {
         type: 'message',
         data: cleanedMessage,
@@ -121,14 +125,14 @@ customElements.define('chat-app',
         key: this.#KEY
       }
 
-      // Append the message to the chat window.
-      const messageElement = document.createElement('p')
-      messageElement.setAttribute('id', 'user-message')
-      messageElement.textContent = `${this.#userName}: ${cleanedMessage}`
-      this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
-
       // Send the message to the server.
       this.#socket.send(JSON.stringify(data))
+
+      // Add username and message to messages array as objects.
+      this.#messages.push({ username: this.#userName, message: cleanedMessage })
+
+      // Update the messages in the chat window.
+      this.#updateMessages()
 
       // Empty the input field.
       this.#inputField.value = ''
@@ -142,8 +146,6 @@ customElements.define('chat-app',
     #receiveMessage (event) {
       const data = JSON.parse(event.data)
 
-      console.log(data)
-
       if (data.username === 'Server' || data.username === 'The Server') {
         // Ignore the messages from the server.
         return
@@ -156,11 +158,28 @@ customElements.define('chat-app',
       const cleanedMessage = DOMPurify.sanitize(data.data)
       const cleanedUsername = DOMPurify.sanitize(data.username)
 
-      // Append the message to the chat window.
-      const messageElement = document.createElement('p')
-      messageElement.setAttribute('id', 'reply-message')
-      messageElement.textContent = `${cleanedUsername}: ${cleanedMessage}`
-      this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
+      // Add username and message to messages array as objects.
+      this.#messages.push({ username: cleanedUsername, message: cleanedMessage })
+
+      this.#updateMessages()
+    }
+
+    /**
+     * Method to update the messages in the chat window.
+     */
+    #updateMessages () {
+      // Clear the chat window.
+      this.shadowRoot.querySelector('#chat-window').innerHTML = ''
+
+      // Display the last 20 messages in the chat window (code snippet as suggested by copilot to render the messages in the order of newest first).
+      for (let i = this.#messages.length - 1; i >= Math.max(0, this.#messages.length - 20); i--) {
+        if (this.#messages[i] !== undefined) {
+          const messageElement = document.createElement('p')
+          messageElement.setAttribute('id', 'reply-message')
+          messageElement.textContent = `${this.#messages[i].username}: ${this.#messages[i].message}`
+          this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
+        }
+      }
     }
 
     /**

@@ -1,25 +1,44 @@
+/**
+ * The ai translator component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
+
 const template = document.createElement('template')
 template.innerHTML = ` 
   <div class="ai-translator">
     <h2>Language Translator</h2>
     <h3>Powered by DeepL AI</h3>
+    <div class="input-output-container">
     <div class="input">
-      <label for="translate-from-language">Translate from:</label>
+      <label for="translate-from-language">
+        Translate from:
+      </label>
       <select id="translate-from-language" class="translate-from-language">
         <option value="">Select language</option>
       </select>
-      <label for="translate-to-language">Translate to:</label>
+      <label for="translate-to-language">
+        Translate to:
+      </label>
       <select id="translate-to-language" class="translate-to-language">
           <option value="">Select language</option>
-      <label for="text-to-translate">Enter text to translate:</label>
+      </select>
+      <label for="text-to-translate">
+        Enter text to translate:
+      </label>
       <textarea id="text-to-translate" class="translate-text" placeholder="Enter text to translate" required></textarea>
     </div>
-    <div class="ai-translator__output">
-      <label for="translated-text">Translated text:</label>
+    <div class="output">
+      <label for="translated-text">
+        Translated text:
+      </label>
       <textarea id="translated-text" class="translated-text" placeholder="Translated text" readonly></textarea>
+       
+      <button id="translate-button" class="translate-button">Translate</button>
       
-      <button id="translate-button" class="ai-translator__button">Translate</button>
-      
+    </div>
+  
       <style>
         .ai-translator {
           display: flex;
@@ -31,6 +50,32 @@ template.innerHTML = `
           border-radius: 10px;
           background-color: lightblue;
         }
+
+        .input, .output {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 1rem;
+        }
+
+        #translate-to-language,
+        #translate-from-language {
+          margin: 0.5rem;
+        }
+
+        .translate-button {
+        font-size: 1.1rem; 
+        background-color: #011627; 
+        color: white; 
+        padding: 5px; 
+        margin-top: 0.5rem; 
+        border-radius: 5px; 
+        }
+
+        .translate-button:active {
+        background-color: #628395;  
+        }
+
       </style>`
 
 customElements.define('ai-translator',
@@ -144,7 +189,7 @@ customElements.define('ai-translator',
         const options = {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
         }
@@ -154,7 +199,9 @@ customElements.define('ai-translator',
         const translatedText = await response.json()
 
         // Display the translated text in the output textarea.
-        this.#translatedText.value = translatedText[0].text
+        for (let i = 0; i < translatedText.length; i++) {
+          this.#translatedText.value = translatedText[i].text
+        }
       } catch (error) {
         throw new Error('There was an error fetching the data:' + error)
       }

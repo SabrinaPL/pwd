@@ -1,3 +1,10 @@
+/**
+ * The app icon component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
+
 const template = document.createElement('template')
 template.innerHTML = `
   <div class="app-icon">

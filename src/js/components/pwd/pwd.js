@@ -1,6 +1,13 @@
 // should it be possible to change desktop background? (maybe a settings icon that opens a settings window where the user can change the background image?)
 // change background image (right click on desktop to open settings window)
 
+/**
+ * The pwd component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
+
 const template = document.createElement('template')
 template.innerHTML = `
   <main id="pwd">
@@ -106,7 +113,7 @@ customElements.define('personal-web-desktop',
      * Method to render the app icons.
      */
     async #renderAppIcons () {
-      await import('../app-icon/app-icon')
+      await import('../app-icon/app-icon.js')
 
       this.#apps.forEach(app => {
         const appIcon = document.createElement('app-icon')
@@ -181,23 +188,23 @@ customElements.define('personal-web-desktop',
      */
     async #openSelectedApp (appName) {
       // Lazy load the components
-      await import('../window/window')
+      await import('../window/window.js')
       if (appName === 'Kanji Memory') {
-        await import('../memory-game/memory-game')
+        await import('../memory-game/memory-game.js')
         // Date.valueOf is used to generate a unique id for the app
         const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game' }
         this.#renderApp(memoryApp)
         this.#runningApps.push(memoryApp)
       }
       if (appName === 'AI Translator') {
-        await import('../ai-translator/ai-translator')
+        await import('../ai-translator/ai-translator.js')
 
         const aiTranslator = { id: new Date().valueOf(), name: 'AI Translator' }
         this.#renderApp(aiTranslator)
         this.#runningApps.push(aiTranslator)
       }
       if (appName === 'Buddy Chat') {
-        await import('../messages/messages')
+        await import('../messages/messages.js')
 
         const chatApp = { id: new Date().valueOf(), name: 'Buddy Chat' }
         this.#renderApp(chatApp)

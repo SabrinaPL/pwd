@@ -1,3 +1,10 @@
+/**
+ * The flipping tile component module.
+ *
+ * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.1.0
+ */
+
 const template = document.createElement('template')
 template.innerHTML = ` 
   <div class="flipping-tile">
@@ -134,6 +141,11 @@ customElements.define('flipping-tile',
       }
     }
 
+    /**
+     * Method to return the attributes to be observed.
+     *
+     * @returns {Array} - The attributes to be observed.
+     */
     static get observedAttributes () {
       return ['image-front', 'image-back']
     }
@@ -144,11 +156,7 @@ customElements.define('flipping-tile',
      * @param {HTMLElement} tile - The tile to be flipped and disabled.
      */
     #flipTile (tile) {
-      // Find a way to access that div element (from the memory game) and add a class to it to flip the card.
       tile.classList.add('is-flipped')
-
-      /* The card is disabled here to test that disabling works, will later be disabled when two cards have been flipped as to prevent the user from flipping more cards in the memory game. */
-      tile.classList.add('is-disabled')
 
       /* I want to communicate to the memory game component that a tile has been flipped and dispatch the flipped tile element so that it can be compared to the previously flipped tile. */
       const tileFlippedEvent = new CustomEvent('tile-is-flipped', {
