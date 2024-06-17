@@ -27,7 +27,6 @@ template.innerHTML = `
       width: 100vw;
       height: 100vh;
       background-color: #C49BBB;
-      background-image: url('../../images/desktop-background.jpg');
       display: flex;
       justify-content: center;
       align-items: center;
@@ -73,6 +72,7 @@ customElements.define('personal-web-desktop',
    * PWD class.
    */
   class extends HTMLElement {
+    #pwd
     #apps
     #appsContainer
     #desktopWrapper
@@ -97,10 +97,15 @@ customElements.define('personal-web-desktop',
     connectedCallback () {
       this.#desktopWrapper = this.shadowRoot.querySelector('#desktop-wrapper')
       this.#appsContainer = this.shadowRoot.querySelector('#apps-container')
+      this.#pwd = this.shadowRoot.querySelector('#pwd')
+
+      // Set the desktop background image.
+      this.#pwd.style.backgroundImage = `url(${this.#generatePath('desktop-background.jpg')})`
+
       this.#apps = [
-        { name: 'Kanji Memory', image: '../../images/kanji9.png' },
-        { name: 'AI Translator', image: '../../images/ai-tutor.jpg' },
-        { name: 'Buddy Chat', image: '../../images/language-exchange.webp' }
+        { name: 'Kanji Memory', image: this.#generatePath('kanji9.png') },
+        { name: 'AI Translator', image: this.#generatePath('ai-tutor.jpg') },
+        { name: 'Buddy Chat', image: this.#generatePath('language-exchange.webp') }
       ]
 
       this.#runningApps = []
@@ -210,6 +215,20 @@ customElements.define('personal-web-desktop',
         this.#renderApp(chatApp)
         this.#runningApps.push(chatApp)
       }
+    }
+
+    /**
+     * Method to generate the path to the module.
+     *
+     * @param {*} filename - The name of the file.
+     * @returns {string} The path to the module.
+     */
+    #generatePath (filename) {
+      // Get the path to the module (as shown in lectures).
+      const pathToModule = import.meta.url
+
+      // Set new path.
+      return new URL(`./images/${filename}`, pathToModule)
     }
 
     /**

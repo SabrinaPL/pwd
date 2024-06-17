@@ -93,7 +93,6 @@ customElements.define('memory-game',
     #memorycards
     #nicknameForm
     #playerName
-    #comparingTiles
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -111,8 +110,6 @@ customElements.define('memory-game',
      */
     connectedCallback () {
       this.#startGameInfo = this.shadowRoot.querySelector('#start-game-info')
-
-      this.#comparingTiles = false
 
       // Present the nickname form to the user.
       this.#nicknameForm = document.createElement('nickname-form')
@@ -221,6 +218,10 @@ customElements.define('memory-game',
           tile.hide()
           this.#previouslySelectedTile.hide()
           this.#previouslySelectedTile = null
+
+          setTimeout(() => {
+            this.#gameOverCheck()
+          }, 1500)
         } else {
           // If the tiles do not match, flip the tiles back.
           setTimeout(() => {
@@ -234,6 +235,25 @@ customElements.define('memory-game',
         /* To keep track of number of tries, regardless of if there is a match or not */
         this.#numOfTries++
       }
+    }
+
+    /**
+     * Method to check if all tiles are hidden, and if so, display a game over message to the user.
+     */
+    #gameOverCheck () {
+      console.log('game over check')
+
+      /*
+          console.log('game over')
+          this.#memoryGameBoard.innerHTML = ''
+          const gameOverMessage = document.createElement('p')
+          gameOverMessage.textContent = `Congratulations ${this.#playerName}! You found all matching pairs in ${this.#numOfTries} tries!`
+          this.#memoryGameBoard.append(gameOverMessage)
+
+          // Append the high score component to the memory game board.
+          const highScore = document.createElement('high-score')
+          this.#memoryGameBoard.append(highScore)
+          */
     }
 
     /**
