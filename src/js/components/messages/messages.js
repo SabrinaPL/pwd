@@ -106,7 +106,7 @@ customElements.define('chat-app',
       const message = this.#inputField.value
 
       // Purify the input from potentially harmful html before sending it to the server (to prevent XSS-attacks).
-      const cleanedMessage = DOMPurify(message)
+      const cleanedMessage = DOMPurify.sanitize(message)
 
       console.log(this.#userName)
 
@@ -118,6 +118,11 @@ customElements.define('chat-app',
         channel: 'Buddy Chat',
         key: this.#KEY
       }
+
+      // Append the message to the chat window.
+      const messageElement = document.createElement('p')
+      messageElement.textContent = `${this.#userName}: ${cleanedMessage}`
+      this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
 
       // Send the message to the server.
       this.#socket.send(JSON.stringify(data))
