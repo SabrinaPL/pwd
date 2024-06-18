@@ -49,6 +49,10 @@ template.innerHTML = `
       justify-content: center;
     }
 
+    .full-height {
+      height: 100%;
+    }
+
     app-window:focus {
       border: 2px solid black;
       z-index: 1;
@@ -162,6 +166,7 @@ customElements.define('personal-web-desktop',
       if (appContent) {
         appContent.slot = 'app'
         appWindow.appendChild(appContent)
+        appContent.classList.add('full-height')
       }
 
       // Add app title and append the app window to the desktop

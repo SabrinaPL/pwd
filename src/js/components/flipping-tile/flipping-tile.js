@@ -13,7 +13,7 @@ template.innerHTML = `
       <img src="" id="front-of-card" alt="kanji image on the front of the card" /><!-- random kanji image will be rendered here -->
     </div>
     <div part="back-of-tile" id="back-of-card">
-      <!-- <img src="" id="back-of-card" alt="kanji image on the back of the card" /> --><!-- set the back of the tile image dynamically -->
+      <!-- set the back of the tile image dynamically -->
     </div>
   </div>
   </div>
@@ -77,7 +77,7 @@ template.innerHTML = `
 
     .flipping-tile:hover {
       /* Opacity is used here to give the user a visual cue as to which card is currently selected (in focus with mouse hover). */
-      opacity: 0.6; 
+      opacity: 0.5; 
     }
 
     .flipping-tile.is-disabled {
@@ -85,10 +85,11 @@ template.innerHTML = `
       pointer-events: none;
     }
 
-    .flipping-tile.is-hidden {
+    div.flipping-tile.is-hidden {
       /* Will be used to hide the card from the user when there is a match. */
       opacity: 0; 
-      transition: opacity 4s;
+      transition: opacity 2s;
+      pointer-events: none;
     }
   </style>
 `
@@ -121,9 +122,6 @@ customElements.define('flipping-tile',
     connectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.addEventListener('click', () => this.#flipTile(tile))
-      tile.addEventListener('render-front-of-tile', (e) => {
-        this.#renderFrontOfTile(e.detail.image)
-      })
     }
 
     /**
@@ -156,6 +154,7 @@ customElements.define('flipping-tile',
      * @param {HTMLElement} tile - The tile to be flipped and disabled.
      */
     #flipTile (tile) {
+      if (tile.classList.contains('is-flipped')) return
       tile.classList.add('is-flipped')
 
       /* I want to communicate to the memory game component that a tile has been flipped and dispatch the flipped tile element so that it can be compared to the previously flipped tile. */
@@ -180,31 +179,19 @@ customElements.define('flipping-tile',
     }
 
     /**
+     * Method to enable a tile.
+     */
+    enable () {
+      this.shadowRoot.querySelector('.flipping-tile').classList.remove('is-disabled')
+    }
+
+    /**
      * Method to hide a tile.
      */
     hide () {
       this.shadowRoot.querySelector('.flipping-tile').classList.add('is-hidden')
       this.classList.add('is-hidden')
-    }
-
-    /**
-     * Method to dynamically render the image on the front of the tile.
-     *
-     * @param {string} image - The image to be rendered on the front of the tile.
-     */
-    #renderFrontOfTile (image) {
-      const frontOfTile = this.shadowRoot.querySelector('slot[name="front"]')
-      frontOfTile.innerHTML = `<img src=${image} alt="kanji image" />`
-    }
-
-    /**
-     * Method to dynamically render the image on the back of the tile.
-     *
-     * @param {*} image - The image to be rendered on the back of the tile.
-     */
-    #renderBackOfTile (image) {
-      const backOfTile = this.shadowRoot.querySelector('slot[name="back"]')
-      backOfTile.innerHTML = `<img src=${image} alt="back of card" />`
+      this.shadowRoot.querySelector('.flipping-tile').classList.add('is-disabled')
     }
 
     /**
@@ -214,8 +201,5 @@ customElements.define('flipping-tile',
     disconnectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.removeEventListener('click', () => this.#flipTile(tile))
-      tile.removeEventListener('render-front-of-tile', (event) => {
-        this.#renderFrontOfTile(event.detail.image)
-      })
     }
   })

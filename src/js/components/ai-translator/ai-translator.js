@@ -12,18 +12,20 @@ template.innerHTML = `
     <h3>Powered by DeepL AI</h3>
     <div class="input-output-container">
     <div class="input">
-      <label for="translate-from-language">
-        Translate from:
-      </label>
-      <select id="translate-from-language" class="translate-from-language">
-        <option value="">Select language</option>
-      </select>
-      <label for="translate-to-language">
-        Translate to:
-      </label>
-      <select id="translate-to-language" class="translate-to-language">
+      <div class="translate-languages">
+        <label for="translate-from-language">
+          Translate from:
+        </label>
+        <select id="translate-from-language" class="translate-from-language">
           <option value="">Select language</option>
-      </select>
+        </select>
+        <label for="translate-to-language">
+          to:
+        </label>
+        <select id="translate-to-language" class="translate-to-language">
+            <option value="">Select language</option>
+        </select>
+      </div>
       <label for="text-to-translate">
         Enter text to translate:
       </label>
@@ -41,14 +43,25 @@ template.innerHTML = `
   
       <style>
         .ai-translator {
+          height: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           margin: 1rem;
-          padding: 1rem;
+          padding: 3rem;
           border: 1px solid black;
           border-radius: 10px;
-          background-color: lightblue;
+          background-color: #B68CB8;
+          color: black;
+        }
+
+        .translate-languages {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          max-width: 500px;
+          margin-bottom: 1rem;
         }
 
         .input, .output {
@@ -123,22 +136,13 @@ customElements.define('ai-translator',
         { code: 'ID', name: 'Indonesian' },
         { code: 'IT', name: 'Italian' },
         { code: 'JA', name: 'Japanese' },
-        { code: 'KO', name: 'Korean' },
         { code: 'LT', name: 'Lithuanian' },
         { code: 'LV', name: 'Latvian' },
         { code: 'NB', name: 'Norwegian Bokmål' },
         { code: 'NL', name: 'Dutch' },
         { code: 'PL', name: 'Polish' },
-        { code: 'PT', name: 'Portuguese' },
-        { code: 'PT-BR', name: 'Portuguese (Brazilian)' },
-        { code: 'PT-PT', name: 'Portuguese (European)' },
-        { code: 'RO', name: 'Romanian' },
         { code: 'RU', name: 'Russian' },
-        { code: 'SK', name: 'Slovak' },
-        { code: 'SL', name: 'Slovenian' },
         { code: 'SV', name: 'Swedish' },
-        { code: 'TR', name: 'Turkish' },
-        { code: 'UK', name: 'Ukrainian' },
         { code: 'ZH', name: 'Chinese (simplified)' }
       ]
 

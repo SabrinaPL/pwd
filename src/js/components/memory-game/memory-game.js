@@ -7,6 +7,7 @@
 
 import '../flipping-tile/flipping-tile'
 import '../nickname-form/nickname-form'
+import '../high-score/high-score'
 
 const template = document.createElement('template')
 template.innerHTML = ` 
@@ -35,7 +36,11 @@ template.innerHTML = `
 
 <style>
   .memory-game {
-    background-color: red;
+    background-color: #E6E8E6;
+    height: 100%;
+    border: 1px solid #000;
+    border-radius: 10px;
+    padding: 3rem;
   }
 
   .memory-game,
@@ -66,6 +71,10 @@ template.innerHTML = `
     box-sizing: border-box;
   }
 
+  .difficulty-buttons {
+    margin-bottom: 1rem;
+  }
+
   #start-game-info.is-hidden {
     display: none;
   }
@@ -94,6 +103,8 @@ customElements.define('memory-game',
     #nicknameForm
     #playerName
     #backOfCard
+    #highScore
+    #gameOverMessage
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -234,24 +245,33 @@ customElements.define('memory-game',
         // If there is no previously selected tile, set the current tile as the previously selected tile.
         this.#previouslySelectedTile = tile
       } else {
+        // Disable the other tiles while the user is comparing the two tiles.
+        this.#memoryGameBoard.querySelectorAll('flipping-tile').forEach(tile => {
+          tile.disable()
+        })
+
         // If there is a previously selected tile, compare the two tiles.
         if (this.#previouslySelectedTile.getAttribute('image-front') === tile.getAttribute('image-front')) {
           tile.hide()
           this.#previouslySelectedTile.hide()
           this.#previouslySelectedTile = null
 
-          setTimeout(() => {
-            this.#gameOver()
-          }, 1500)
+          this.#gameOver()
         } else {
           // If the tiles do not match, flip the tiles back.
           setTimeout(() => {
             tile.flipBack()
+            if (this.#previouslySelectedTile === null) return
             this.#previouslySelectedTile.flipBack()
             // Reset the previously selected tile to null so that the next pair of tiles can be compared.
             this.#previouslySelectedTile = null
           }, 1200)
         }
+
+        // Reset the disabled state of the tiles so that the user can continue playing.
+        this.#memoryGameBoard.querySelectorAll('flipping-tile').forEach(tile => {
+          tile.enable()
+        })
 
         /* To keep track of number of tries, regardless of if there is a match or not */
         this.#numOfTries++
@@ -262,21 +282,47 @@ customElements.define('memory-game',
      * Method to check if the game is over.
      */
     #gameOver () {
-      console.log(this.#memoryGameBoard.querySelectorAll('flipping-tile'))
-
       // Check if there are any tiles left on the board.
       if (this.#memoryGameBoard.querySelectorAll('flipping-tile.is-hidden').length === this.#columns * this.#rows) {
-        // Clear the memory game board.
-        this.#memoryGameBoard.innerHTML = ''
+        setTimeout(() => {
+          // Clear the memory game board.
+          this.#memoryGameBoard.innerHTML = ''
 
-        // If there are no tiles left, present the user with a message that the game is over.
-        const gameOverMessage = document.createElement('div')
-        gameOverMessage.textContent = `Congratulations ${this.#playerName}! You finished the game in ${this.#numOfTries} tries!`
-        this.#memoryGameBoard.append(gameOverMessage)
+          // If there are no tiles left, present the user with a message that the   game is over.
+          this.#gameOverMessage = document.createElement('div')
+          this.#gameOverMessage.textContent = `Congratulations ${this.#playerName}  ! You finished the game in ${this.#numOfTries} tries!`
+          this.#memoryGameBoard.append(this.#gameOverMessage)
 
-        // Reset the number of tries.
-        this.#numOfTries = 0
+          // Create a high score component.
+          this.#highScore = document.createElement('high-score')
+          this.#highScore.addEventListener('playAgain', () => {
+            this.#restartGame()
+          })
+
+          // Create a player object.
+          const player = {
+            nickname: this.#playerName,
+            score: this.#numOfTries
+          }
+          // Send the player object to the high score component.
+          this.#highScore.saveHighScore(player)
+          // Show the high score.
+          this.#highScore.showHighScore()
+          // Append the high score component to the memory game board.
+          this.#memoryGameBoard.append(this.#highScore)
+          // Reset the number of tries.
+          this.#numOfTries = 0
+        }, 2000)
       }
+    }
+
+    /**
+     * Method to restart the game.
+     */
+    #restartGame () {
+      this.#gameOverMessage.remove()
+      this.#highScore.remove()
+      this.#startGameInfo.classList.remove('is-hidden')
     }
 
     /**
@@ -286,5 +332,8 @@ customElements.define('memory-game',
       this.#difficultyBtns.forEach(btn => {
         btn.removeEventListener('change', () => {})
       })
+      this.removeEventListener('nickname-added', () => {})
+      this.removeEventListener('tile-is-flipped', () => {})
+      this.removeEventListener('playAgain', () => {})
     }
   })

@@ -20,31 +20,62 @@ template.innerHTML = `
     <div id="chat-window">
       <!-- Chat messages go here -->
     </div>
-    <form id="chat-form">
-      <input type="text" id="message-input" placeholder="Type a message...">
-      <button type="emoji" id="emoji-button">😀</button>
-      <button type="submit" id="send-button">Send</button>
-      <emoji-picker class="light"></emoji-picker>
-    </form>
+    <div id="form-and-emoji-container">
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button type="submit" id="send-button">Send</button>
+        <button type="emoji" id="emoji-button">😀</button>
+        <emoji-picker class="dark"></emoji-picker>
+      </form>
+    </div>
+  </div>
 </main>
 
 <style>
   #chat-app {
-    width: 100%;
     height: 100%;
-    background-color: pink;
+    background-color: #000009;
+    color: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 3rem;
   }
 
-  .btn {
+  h2 {
+    color: #32CD32;
+  }
+
+  .form-and-emoji-container {
+    display: flex;
+    justify-content: center;
+    align-items: left;
+  }
+
+  #chat-window {
+    height: 30vh;
+    overflow-y: scroll;
+    padding: 1rem;
+    border: 1px solid white;
+    border-radius: 10px;
+  }
+
+  input {
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-right: 0.5rem;
+  }
+
+  button {
   font-size: 1.1rem; 
-  background-color: #FF66B3; 
-  color: white; 
+  background-color: white; 
+  color: black; 
   padding: 5px; 
   margin-top: 0.5rem; 
   border-radius: 5px; 
   }
 
-  .btn:active {
+  button:active {
   background-color: #42BFDD;  
   }
 
@@ -179,6 +210,8 @@ customElements.define('chat-app',
         if (this.#messages[i] !== undefined) {
           const messageElement = document.createElement('p')
           messageElement.setAttribute('id', 'reply-message')
+          // Code snippet as suggested by copilot to color the messages of the user in red and the messages of other users in blue.
+          this.#messages[i].username === this.#userName ? messageElement.style.color = '#ff80c5' : messageElement.style.color = '#8aff9c'
           messageElement.textContent = `${this.#messages[i].username}: ${this.#messages[i].message}`
           this.shadowRoot.querySelector('#chat-window').appendChild(messageElement)
         }

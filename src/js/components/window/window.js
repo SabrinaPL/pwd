@@ -8,24 +8,22 @@
 const template = document.createElement('template')
 template.innerHTML = `
   <div id="app-window">
-    <div id="window-header">
-      <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
-      <div group="window-btns">
-        <button id="close-window">X</button>
+      <div id="window-header">
+        <h3><slot name="app-title"><!-- window title goes here --></slot></h3>
+        <div group="window-btns">
+          <button id="close-window">X</button>
+        </div>
       </div>
-    </div>
-    <div id="app-component">
-      <slot name="app"><!-- app component goes here --></slot>
-    </div>
+      <div id="app-component">
+        <slot name="app"><!-- app component goes here --></slot>
+      </div>
   </div>
 
   <style>
     :host {
       position: absolute;
-      min-width: 500px;
-      min-height: 500px;
+      background-color: rgba(255, 255, 255, 0.8);
       padding: 0;
-      background-color: white;
       border: 1px solid black;
       border-radius: 10px;
       overflow: hidden;
@@ -35,11 +33,21 @@ template.innerHTML = `
       right: 65%; <!-- Default position -->
     }
 
+    #app-window {
+      height: 100%; 
+    }
+
+    #app-component {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: 100%;
+    }
+
     #window-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #C5C5C5;
       padding: 0.5rem 1rem;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
@@ -51,7 +59,6 @@ template.innerHTML = `
       flex: 1;
       flex-direction: column;
       overflow: auto;
-      background-color: #F5F5F5;
       padding: 1rem;
     }
 
