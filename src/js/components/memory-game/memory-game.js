@@ -31,6 +31,11 @@ template.innerHTML = `
     </div> 
 </div>
     <div id="memory-game-board">
+      <!-- The flipping tiles will be rendered here -->
+    </div>
+    <div id="game-over-container">
+      <!-- The game over message will be rendered here -->
+      <!-- The high score component will be rendered here -->
     </div>
 <div>
 
@@ -95,6 +100,7 @@ customElements.define('memory-game',
     #startGameInfo
     #memoryGameBoard
     #difficultyBtns
+    #difficulty
     #columns
     #rows
     #previouslySelectedTile
@@ -104,7 +110,7 @@ customElements.define('memory-game',
     #playerName
     #backOfCard
     #highScore
-    #gameOverMessage
+    #gameOverContainer
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -131,6 +137,8 @@ customElements.define('memory-game',
 
       this.#difficultyBtns = this.shadowRoot.querySelectorAll('input[name="difficulty"]')
 
+      this.#gameOverContainer = this.shadowRoot.querySelector('#game-over-container')
+
       this.#numOfTries = 0
       this.#memorycards = []
 
@@ -139,6 +147,7 @@ customElements.define('memory-game',
         btn.addEventListener('change', () => {
           this.#columns = btn.dataset.columns
           this.#rows = btn.dataset.rows
+          this.#difficulty = btn.value
         })
       })
 
@@ -288,10 +297,8 @@ customElements.define('memory-game',
           // Clear the memory game board.
           this.#memoryGameBoard.innerHTML = ''
 
-          // If there are no tiles left, present the user with a message that the   game is over.
-          this.#gameOverMessage = document.createElement('div')
-          this.#gameOverMessage.textContent = `Congratulations ${this.#playerName}  ! You finished the game in ${this.#numOfTries} tries!`
-          this.#memoryGameBoard.append(this.#gameOverMessage)
+          // If there are no tiles left, present the user with a message that the game is over.
+          this.#gameOverContainer.textContent = `Congratulations ${this.#playerName}  ! You finished the game in ${this.#numOfTries} tries!`
 
           // Create a high score component.
           this.#highScore = document.createElement('high-score')
@@ -302,14 +309,16 @@ customElements.define('memory-game',
           // Create a player object.
           const player = {
             nickname: this.#playerName,
-            score: this.#numOfTries
+            score: this.#numOfTries,
+            difficulty: this.#difficulty
           }
+
           // Send the player object to the high score component.
           this.#highScore.saveHighScore(player)
           // Show the high score.
           this.#highScore.showHighScore()
           // Append the high score component to the memory game board.
-          this.#memoryGameBoard.append(this.#highScore)
+          this.#gameOverContainer.append(this.#highScore)
           // Reset the number of tries.
           this.#numOfTries = 0
         }, 2000)
@@ -320,7 +329,7 @@ customElements.define('memory-game',
      * Method to restart the game.
      */
     #restartGame () {
-      this.#gameOverMessage.remove()
+      this.#gameOverContainer.remove()
       this.#highScore.remove()
       this.#startGameInfo.classList.remove('is-hidden')
     }

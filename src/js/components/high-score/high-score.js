@@ -5,26 +5,29 @@
  * @version 1.1.0
  */
 
+import DOMPurify from 'dompurify'
+
 const template = document.createElement('template')
 template.innerHTML = `
     <h1><slot></slot></h1>
-    <h2>High score of the top 5 players:</h2>
+    <h2>High score:</h2>
     <ul id="high-score">
     </ul>
     <div>
         <button type="submit" class="btn">Play again</button>
+        <button type="submit" class="btn" id="clear-high-score">Clear high score</button>
     </div>
 
     <style>
         #high-score {
-          color: #5FDDDB; 
+          color: black; 
           font-size: 1.5rem;
           list-style: none; 
         }
 
         .btn {
         font-size: 1.1rem; 
-        background-color: #FF66B3; 
+        background-color: #011627;
         color: white; 
         padding: 5px; 
         margin-top: 0.5rem; 
@@ -32,7 +35,7 @@ template.innerHTML = `
         }
 
         .btn:active {
-        background-color: #42BFDD;  
+        background-color: #628395;  
         }
     </style>
 `
@@ -83,8 +86,16 @@ customElements.define('high-score',
       // Add a player to the high score list array of objects.
       this.#highScoreList.push(player)
 
-      // Sort the high scores (with the lowest value - i.e. fastest time - displayed at the top of the high score).
-      this.#highScoreList.sort((a, b) => a.score - b.score)
+      // Sort the high scores.
+      this.#highScoreList.sort((a, b) => {
+        // Compare difficulty levels first.
+        if (a.difficulty !== b.difficulty) {
+          // Sort by difficulty level.
+          return a.difficulty.localeCompare(b.difficulty)
+        }
+        // If difficulty levels are the same, then sort by score.
+        return a.score - b.score
+      })
 
       // Save the current high score in the local storage.
       localStorage.setItem('highScoreList', JSON.stringify(this.#highScoreList))
@@ -107,7 +118,10 @@ customElements.define('high-score',
 
       // Iterate through the high score list and create li-elements to add the high scores to.
       for (const highScore of this.#highScoreList) {
-        highScoreUl.innerHTML += `<li>${highScore.nickname}: ${highScore.score}</li>`
+        // Use DOMPurify to sanitize the nickname.
+        DOMPurify.sanitize('nickname')
+
+        highScoreUl.innerHTML += `<li>${highScore.nickname}:</li><li>score: ${highScore.score}</li><li>difficulty: ${highScore.difficulty}</li><br>`
       }
     }
 
@@ -131,6 +145,13 @@ customElements.define('high-score',
     }
 
     /**
+     * Function to clear the high score list from the local storage.
+     */
+    #clearHighScore () {
+      localStorage.clear()
+    }
+
+    /**
      * Connected callback that is invoked when the element is added to the DOM.
      *
      * @function
@@ -141,6 +162,11 @@ customElements.define('high-score',
         // Dispatch the event.
         this.dispatchEvent(new CustomEvent('playAgain', {}))
       })
+
+      this.shadowRoot.querySelector('#clear-high-score').addEventListener('click', () => {
+        this.#clearHighScore()
+        this.showHighScore()
+      })
     }
 
     /**
@@ -150,6 +176,11 @@ customElements.define('high-score',
       // Remove event listener from play again button.
       this.shadowRoot.querySelector('.btn').removeEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('playAgain', {}))
+      })
+
+      this.shadowRoot.querySelector('#clear-high-score').removeEventListener('click', () => {
+        this.#clearHighScore()
+        this.showHighScore()
       })
     }
   })

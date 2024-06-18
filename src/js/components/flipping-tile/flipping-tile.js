@@ -156,6 +156,7 @@ customElements.define('flipping-tile',
     #flipTile (tile) {
       if (tile.classList.contains('is-flipped')) return
       tile.classList.add('is-flipped')
+      tile.classList.add('is-disabled')
 
       /* I want to communicate to the memory game component that a tile has been flipped and dispatch the flipped tile element so that it can be compared to the previously flipped tile. */
       const tileFlippedEvent = new CustomEvent('tile-is-flipped', {
