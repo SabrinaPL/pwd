@@ -5,20 +5,21 @@
  * @version 1.1.0
  */
 
-import '../flipping-tile/flipping-tile'
-import '../nickname-form/nickname-form'
-import '../high-score/high-score'
+import '../flipping-tile/flipping-tile.js'
+import '../nickname-form/nickname-form.js'
+import '../high-score/high-score.js'
 
 const template = document.createElement('template')
 template.innerHTML = ` 
 <div class="memory-game">
+  <div id="game-header">
     <h1>Kanji memory</h1>
     <p>Try to find all matching pairs of 漢字 (kanji)</p>
+  </div>
 
 <div id="start-game-info">
     <p>Choose game difficulty:</p>
-    <div class="difficulty-buttons">
-
+    <form class="difficulty-buttons">
       <!-- The data-columns and data-rows attributes are used to dynamically set the number of columns and rows in the memory game board. -->
       <input type="radio" id="easy" name="difficulty" value="easy" data-columns="2" data-rows="2">
       <label for="easy"><strong>子供</strong> (Easy)</label>
@@ -28,7 +29,7 @@ template.innerHTML = `
 
       <input type="radio" id="hard" name="difficulty" value="hard" data-columns="4" data-rows="4">
       <label for="hard"><strong>死ぬ</strong> (Hard)</label>
-    </div> 
+    </form> 
 </div>
     <div id="memory-game-board">
       <!-- The flipping tiles will be rendered here -->
@@ -49,7 +50,8 @@ template.innerHTML = `
   }
 
   .memory-game,
-  #start-game-info {
+  #start-game-info,
+  #game-header {
     display: flex; 
     flex-direction: column;
     align-items: center;
@@ -64,6 +66,14 @@ template.innerHTML = `
   .memory-game p {
     margin: 0.5rem; 
     font-size: 1.5rem; 
+  }
+
+  .game-over-container {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.5rem; 
+    font-weight: bold;
   }
 
   #memory-game-board {
@@ -148,6 +158,16 @@ customElements.define('memory-game',
           this.#columns = btn.dataset.columns
           this.#rows = btn.dataset.rows
           this.#difficulty = btn.value
+        })
+
+        btn.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            this.#columns = btn.dataset.columns
+            this.#rows = btn.dataset.rows
+            this.#difficulty = btn.value
+            event.preventDefault()
+            btn.checked = true
+          }
         })
       })
 
@@ -254,10 +274,10 @@ customElements.define('memory-game',
         // If there is no previously selected tile, set the current tile as the previously selected tile.
         this.#previouslySelectedTile = tile
       } else {
-        // Disable the other tiles while the user is comparing the two tiles.
-        this.#memoryGameBoard.querySelectorAll('flipping-tile').forEach(tile => {
-          tile.disable()
-        })
+        // Disable the other tiles while the user is comparing two tiles.
+        for (let i = 0; i < this.#memoryGameBoard.children.length; i++) {
+          this.#memoryGameBoard.children[i].disable()
+        }
 
         // If there is a previously selected tile, compare the two tiles.
         if (this.#previouslySelectedTile.getAttribute('image-front') === tile.getAttribute('image-front')) {
@@ -277,10 +297,12 @@ customElements.define('memory-game',
           }, 1200)
         }
 
-        // Reset the disabled state of the tiles so that the user can continue playing.
-        this.#memoryGameBoard.querySelectorAll('flipping-tile').forEach(tile => {
-          tile.enable()
-        })
+        setTimeout(() => {
+          // Reset the disabled state of the tiles so that the can continue playing.
+          for (let i = 0; i < this.#memoryGameBoard.children.length; i++) {
+            this.#memoryGameBoard.children[i].enable()
+          }
+        }, 1200)
 
         /* To keep track of number of tries, regardless of if there is a match or not */
         this.#numOfTries++
@@ -296,6 +318,9 @@ customElements.define('memory-game',
         setTimeout(() => {
           // Clear the memory game board.
           this.#memoryGameBoard.innerHTML = ''
+
+          // Hide the memory game header.
+          this.shadowRoot.querySelector('#game-header').setAttribute('style', 'display: none')
 
           // If there are no tiles left, present the user with a message that the game is over.
           this.#gameOverContainer.textContent = `Congratulations ${this.#playerName}  ! You finished the game in ${this.#numOfTries} tries!`
@@ -329,6 +354,7 @@ customElements.define('memory-game',
      * Method to restart the game.
      */
     #restartGame () {
+      this.shadowRoot.querySelector('#game-header').removeAttribute('style')
       this.#gameOverContainer.remove()
       this.#highScore.remove()
       this.#startGameInfo.classList.remove('is-hidden')
@@ -340,6 +366,9 @@ customElements.define('memory-game',
     disconnectedCallback () {
       this.#difficultyBtns.forEach(btn => {
         btn.removeEventListener('change', () => {})
+      })
+      this.#difficultyBtns.forEach(btn => {
+        btn.removeEventListener('keydown', () => {})
       })
       this.removeEventListener('nickname-added', () => {})
       this.removeEventListener('tile-is-flipped', () => {})

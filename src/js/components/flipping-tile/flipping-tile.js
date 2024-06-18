@@ -10,7 +10,7 @@ template.innerHTML = `
   <div class="flipping-tile">
   <div id="wrapper">
     <div part="front-of-tile">
-      <img src="" id="front-of-card" alt="kanji image on the front of the card" /><!-- random kanji image will be rendered here -->
+      <img src="" id="front-of-card" alt="kanji image on the front of the card"/><!-- random kanji image will be rendered here -->
     </div>
     <div part="back-of-tile" id="back-of-card">
       <!-- set the back of the tile image dynamically -->
@@ -121,7 +121,13 @@ customElements.define('flipping-tile',
      */
     connectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
+      tile.tabIndex = 0
       tile.addEventListener('click', () => this.#flipTile(tile))
+      tile.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          this.#flipTile(tile)
+        }
+      })
     }
 
     /**
@@ -202,5 +208,10 @@ customElements.define('flipping-tile',
     disconnectedCallback () {
       const tile = this.shadowRoot.querySelector('.flipping-tile')
       tile.removeEventListener('click', () => this.#flipTile(tile))
+      tile.removeEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          this.#flipTile(tile)
+        }
+      })
     }
   })

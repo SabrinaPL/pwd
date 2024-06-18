@@ -5,7 +5,7 @@ The AI Translator Component is a web component that allows users to translate te
 ## Author
 
 Sabrina Prichard-Lybeck  
-Email: sp223kz@student.lnu.se  
+Email: <sp223kz@student.lnu.se>
 
 ## Version
 
