@@ -1,6 +1,15 @@
 # Nickname Form Web Component
 
-The Nickname Form Web Component is a custom element that collects a player's nickname for use in the quiz. It features a form with a text input and a "Let's play!" button.
+The Nickname Form Web Component is a custom element that collects a player's nickname for use in the quiz. It features a form with a text input and a "Enter" button.
+
+## Author
+
+Sabrina Prichard-Lybeck  
+Email: <sp223kz@student.lnu.se>  
+
+## Version
+
+1.1.0
 
 ## Events
 

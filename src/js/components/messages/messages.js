@@ -1,5 +1,5 @@
 /**
- * The memory game component module.
+ * The chat app component module.
  *
  * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
  * @version 1.1.0
@@ -13,12 +13,12 @@ const template = document.createElement('template')
 template.innerHTML = `
 <main id="chat-app">
   <h2>Chat with your buddies in realtime</h2>
-  <div id="nickname">
-    <!-- Nickname form goes here -->
-  </div>
   <div id="chat-container">
     <div id="chat-window">
       <!-- Chat messages go here -->
+    </div>
+    <div id="nickname">
+    <!-- Nickname form goes here -->
     </div>
     <div id="form-and-emoji-container">
       <form id="chat-form">
@@ -168,7 +168,7 @@ customElements.define('chat-app',
         // Empty the input field.
         this.#inputField.value = ''
       } catch (error) {
-        throw new Error('There was an error sending the message: ' + error)
+        console.error('There was an error sending the message: ' + error)
       }
     }
 
@@ -262,8 +262,13 @@ customElements.define('chat-app',
       })
       this.#socket.addEventListener('message', event => {
         this.#receiveMessage(event)
-      }
-      )
+      })
+      this.#socket.addEventListener('close', () => {
+        console.log('Disconnected from server')
+      })
+      this.#socket.addEventListener('error', (error) => {
+        console.error('WebSocket error occurred: ' + error)
+      })
     }
 
     /**
@@ -273,8 +278,9 @@ customElements.define('chat-app',
       this.#socket.close()
       console.log('Socket connection closed')
       this.#chatForm.removeEventListener('submit', this.#submitMessage)
-      this.#inputField.removeEventListener('click')
-      this.#emojiPicker.removeEventListener('emoji-click')
-      this.#emojiBtn.removeEventListener('click')
+      this.#emojiBtn.removeEventListener('click', this.#emojiPicker)
+      this.#emojiPicker.removeEventListener('emoji-click', this.#inputField)
+      this.#socket.removeEventListener('open', this.#socket.close)
+      this.#socket.removeEventListener('message', this.#receiveMessage)
     }
   })

@@ -1,130 +1,69 @@
-# Flipping Tile Custom Component
+# Flipping Tile Component
 
-This is a custom HTML component representing a flipping tile. The component is designed to be used in memory games, allowing tiles to flip to reveal their back sides and dispatch events when flipped.
+The Flipping Tile Component is a custom web component that represents a tile which can be flipped to reveal a front and back image. This component is ideal for memory games or other interactive applications.
 
-## Table of Contents
+## Author
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Attributes](#attributes)
-- [Methods](#methods)
-- [Events](#events)
-- [Customization](#customization)
-- [Contributing](#contributing)
-- [License](#license)
+Sabrina Prichard-Lybeck  
+Email: <sp223kz@student.lnu.se>
+
+## Version
+
+1.1.0
 
 ## Features
 
-- Custom element for displaying a flipping tile.
-- Smooth flip animation and transition effects.
-- Customizable front and back content using slots.
-- Dispatches events when tiles are flipped.
-
-## Installation
-
-To use the `flipping-tile` component in your project, include the following script in your HTML file:
-
-```html
-<script src="path/to/flipping-tile.js"></script>
-```
-
-Or, if using ES6 modules, import the component:
-
-```javascript
-import './path/to/flipping-tile.js';
-```
+- Flips to reveal a front and back side.
+- Dynamic setting of front and back images through attributes.
+- Smooth flip animations.
+- Disabled state to prevent further interactions.
+- Hidden state for matched tiles.
+- Hover effect to indicate the selected tile.
 
 ## Usage
 
-Add the custom element to your HTML file:
+### Installation
+
+Include the component in your project:
 
 ```html
-<flipping-tile>
-  <div slot="front">Front Content</div>
-  <div slot="back">Back Content</div>
-</flipping-tile>
+<script type="module" src="path/to/flipping-tile.js"></script>
 ```
 
-## Attributes
+### HTML
 
-The `flipping-tile` component does not have custom attributes. However, you can customize the content inside the tile using slots.
-
-## Methods
-
-The component includes the following methods:
-
-- `#flipTile(tile)`: Flips the tile and disables it to prevent further interaction.
-
-## Events
-
-The component dispatches a custom event when the tile is flipped:
-
-- `tile-is-flipped`: Fired when the tile is flipped. The event's detail includes the flipped tile element.
-
-## Customization
-
-You can customize the styles of the component by modifying the CSS within the `<style>` tag in the JavaScript file.
-
-Default styles:
-
-```css
-.flipping-tile {
-  width: 100%;
-  height: 100%;
-  margin: 1rem;
-  border: 1px solid black;
-  border-radius: 10px;
-  padding: 10px;
-  transition: opacity 1s;
-  background-color: white;
-}
-
-#wrapper {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-::part(front-of-tile),
-::part(back-of-tile) {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  backface-visibility: hidden;
-  border-radius: 10px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-::part(front-of-tile) {
-  background-color: #f5e9ee;
-  background-image: url('../../images/kanji6.png');
-  transform: rotateY(180deg);
-}
-
-::part(back-of-tile) {
-  background-color: red;
-  background-image: url('../../images/back-of-card.png');
-}
-
-.flipping-tile.is-flipped #wrapper {
-  transform: rotateY(180deg);
-  transition: transform 1s;
-}
-
-.flipping-tile:hover {
-  opacity: 0.6;
-}
-
-.flipping-tile.is-disabled {
-  pointer-events: none;
-}
-
-.flipping-tile.is-hidden {
-  opacity: 0;
-  transition: opacity 4s;
-}
+```html
+<flipping-tile image-front="path/to/front-image.jpg" image-back="path/to/back-image.jpg"></flipping-tile>
 ```
+
+### JavaScript
+
+```html
+customElements.define('flipping-tile', class extends HTMLElement {
+  // The class implementation goes here.
+})
+```
+
+### Attributes
+
+*image-front: URL of the image to display on the front of the tile.
+*image-back: URL of the image to display on the back of the tile.
+
+### Methods
+
+*flipBack(): Flips the tile back to its original state.
+*disable(): Disables the tile to prevent user interaction.
+*enable(): Enables the tile to allow user interaction.
+*hide(): Hides the tile, typically used when a match is found.
+
+### Styles
+
+Customize the appearance of the flipping tile component by modifying the embedded styles within the template.
+
+### Events
+
+*tile-is-flipped: Dispatched when a tile is flipped. Contains the flipped tile element in the detail property.
+
+### License
+
+This project is licensed under the MIT License.

@@ -119,7 +119,7 @@ customElements.define('high-score',
       // Iterate through the high score list and create li-elements to add the high scores to.
       for (const highScore of this.#highScoreList) {
         // Use DOMPurify to sanitize the nickname.
-        DOMPurify.sanitize('nickname')
+        DOMPurify.sanitize(highScore.nickname)
 
         highScoreUl.innerHTML += `<li>${highScore.nickname}:</li><li>score: ${highScore.score}</li><li>difficulty: ${highScore.difficulty}</li><br>`
       }

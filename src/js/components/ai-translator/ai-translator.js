@@ -17,7 +17,7 @@ template.innerHTML = `
           Translate from:
         </label>
         <select id="translate-from-language" class="translate-from-language">
-          <option value="">Select language</option>
+          <option value="">Select language/auto-detect</option>
         </select>
         <label for="translate-to-language">
           to:
@@ -53,6 +53,19 @@ template.innerHTML = `
           border-radius: 10px;
           background-color: #B68CB8;
           color: black;
+        }
+
+        textarea {
+          width: 100%;
+          height: 50px;
+          padding: 10px;
+          margin: 10px 0;
+          box-sizing: border-box;
+          border: 2px solid #ccc;
+          border-radius: 4px;
+          background-color: #f8f8f8;
+          resize: none;
+          font-size: 1rem;
         }
 
         .translate-languages {
@@ -102,6 +115,8 @@ customElements.define('ai-translator',
     #translateFromLanguage
     #translateToLanguage
     #sourceLanguages
+    #targetLanguages
+    #fromLanguage
     #URL = 'http://localhost:3000/translate'
 
     /**
@@ -126,6 +141,37 @@ customElements.define('ai-translator',
         { code: 'DE', name: 'German' },
         { code: 'EL', name: 'Greek' },
         { code: 'EN', name: 'English' },
+        { code: 'ES', name: 'Spanish' },
+        { code: 'ET', name: 'Estonian' },
+        { code: 'FI', name: 'Finnish' },
+        { code: 'FR', name: 'French' },
+        { code: 'HU', name: 'Hungarian' },
+        { code: 'ID', name: 'Indonesian' },
+        { code: 'IT', name: 'Italian' },
+        { code: 'JA', name: 'Japanese' },
+        { code: 'KO', name: 'Korean' },
+        { code: 'LT', name: 'Lithuanian' },
+        { code: 'LV', name: 'Latvian' },
+        { code: 'NB', name: 'Norwegian Bokmål' },
+        { code: 'NL', name: 'Dutch' },
+        { code: 'PL', name: 'Polish' },
+        { code: 'RO', name: 'Romanian' },
+        { code: 'RU', name: 'Russian' },
+        { code: 'SK', name: 'Slovak' },
+        { code: 'SL', name: 'Slovenian' },
+        { code: 'SV', name: 'Swedish' },
+        { code: 'TR', name: 'Turkish' },
+        { code: 'UK', name: 'Ukrainian' },
+        { code: 'ZH', name: 'Chinese' }
+      ]
+
+      this.#targetLanguages = [
+        { code: 'AR', name: 'Arabic' },
+        { code: 'BG', name: 'Bulgarian' },
+        { code: 'CS', name: 'Czech' },
+        { code: 'DA', name: 'Danish' },
+        { code: 'DE', name: 'German' },
+        { code: 'EL', name: 'Greek' },
         { code: 'EN-GB', name: 'English (British)' },
         { code: 'EN-US', name: 'English (American)' },
         { code: 'ES', name: 'Spanish' },
@@ -136,13 +182,20 @@ customElements.define('ai-translator',
         { code: 'ID', name: 'Indonesian' },
         { code: 'IT', name: 'Italian' },
         { code: 'JA', name: 'Japanese' },
+        { code: 'KO', name: 'Korean' },
         { code: 'LT', name: 'Lithuanian' },
         { code: 'LV', name: 'Latvian' },
         { code: 'NB', name: 'Norwegian Bokmål' },
         { code: 'NL', name: 'Dutch' },
         { code: 'PL', name: 'Polish' },
+        { code: 'PT-BR', name: 'Portuguese (Brazilian)' },
+        { code: 'RO', name: 'Romanian' },
         { code: 'RU', name: 'Russian' },
+        { code: 'SK', name: 'Slovak' },
+        { code: 'SL', name: 'Slovenian' },
         { code: 'SV', name: 'Swedish' },
+        { code: 'TR', name: 'Turkish' },
+        { code: 'UK', name: 'Ukrainian' },
         { code: 'ZH', name: 'Chinese (simplified)' }
       ]
 
@@ -166,6 +219,9 @@ customElements.define('ai-translator',
         optionFrom.value = lang.code
         optionFrom.textContent = lang.name
         this.#translateFromLanguage.appendChild(optionFrom)
+      })
+
+      this.#targetLanguages.forEach(lang => {
         const optionTo = document.createElement('option')
         optionTo.value = lang.code
         optionTo.textContent = lang.name
@@ -179,13 +235,24 @@ customElements.define('ai-translator',
     async #translateText () {
       try {
         const textToTranslate = this.#textToTranslate.value
-        const fromLang = this.#translateFromLanguage.value
+        this.#fromLanguage = this.#translateFromLanguage.value
         const toLang = this.#translateToLanguage.value
+
+        // Check if the from language is empty and set it to null for auto detect.
+        if (this.#fromLanguage === '') {
+          this.#fromLanguage = null
+        }
+
+        // Check if any of the input fields are empty and present a message to the user.
+        if (textToTranslate === '' || toLang === '') {
+          this.#translatedText.value = 'Please fill in the text you wish you translate and select a target language.'
+          return
+        }
 
         // Set the data to send to the DeepL API.
         const data = {
           text: [textToTranslate],
-          source_lang: fromLang,
+          source_lang: this.#fromLanguage,
           target_lang: toLang
         }
 
@@ -198,6 +265,9 @@ customElements.define('ai-translator',
           body: JSON.stringify(data)
         }
 
+        // Render translating... message in the output textarea.
+        this.#translatedText.value = 'Translating...'
+
         // Send the request to the DeepL API.
         const response = await fetch(this.#URL, options)
         const translatedText = await response.json()
@@ -207,7 +277,14 @@ customElements.define('ai-translator',
           this.#translatedText.value = translatedText[i].text
         }
       } catch (error) {
-        throw new Error('There was an error fetching the data:' + error)
+        console.error('There was an error fetching the data:' + error)
       }
+    }
+
+    /**
+     * Called when the component is disconnected from the DOM.
+     */
+    disconnectedCallback () {
+      this.#translateButton.removeEventListener('click', this.#translateText.bind(this))
     }
   })

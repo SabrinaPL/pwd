@@ -128,15 +128,19 @@ customElements.define('personal-web-desktop',
      * Method to render the app icons.
      */
     async #renderAppIcons () {
-      await import('../app-icon/app-icon.js')
+      try {
+        await import('../app-icon/app-icon.js')
 
-      this.#apps.forEach(app => {
-        const appIcon = document.createElement('app-icon')
-        appIcon.setAttribute('name', app.name)
-        appIcon.setAttribute('image', app.image)
-        appIcon.addEventListener('click', () => this.#openSelectedApp(app.name))
-        this.#appsContainer.appendChild(appIcon)
-      })
+        this.#apps.forEach(app => {
+          const appIcon = document.createElement('app-icon')
+          appIcon.setAttribute('name', app.name)
+          appIcon.setAttribute('image', app.image)
+          appIcon.addEventListener('click', () => this.#openSelectedApp(app.name))
+          this.#appsContainer.appendChild(appIcon)
+        })
+      } catch (error) {
+        console.error('Error loading app-icons:', error)
+      }
     }
 
     /**
@@ -203,28 +207,32 @@ customElements.define('personal-web-desktop',
      * @param {string} appName - The name of the app to open.
      */
     async #openSelectedApp (appName) {
-      // Lazy load the components
-      await import('../window/window.js')
-      if (appName === 'Kanji Memory') {
-        await import('../memory-game/memory-game.js')
-        // Date.valueOf is used to generate a unique id for the app
-        const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game' }
-        this.#renderApp(memoryApp)
-        this.#runningApps.push(memoryApp)
-      }
-      if (appName === 'AI Translator') {
-        await import('../ai-translator/ai-translator.js')
+      try {
+        // Lazy load the components
+        await import('../window/window.js')
+        if (appName === 'Kanji Memory') {
+          await import('../memory-game/memory-game.js')
+          // Date.valueOf is used to generate a unique id for the app
+          const memoryApp = { id: new Date().valueOf(), name: 'Kanji Memory Game' }
+          this.#renderApp(memoryApp)
+          this.#runningApps.push(memoryApp)
+        }
+        if (appName === 'AI Translator') {
+          await import('../ai-translator/ai-translator.js')
 
-        const aiTranslator = { id: new Date().valueOf(), name: 'AI Translator' }
-        this.#renderApp(aiTranslator)
-        this.#runningApps.push(aiTranslator)
-      }
-      if (appName === 'Buddy Chat') {
-        await import('../messages/messages.js')
+          const aiTranslator = { id: new Date().valueOf(), name: 'AI Translator' }
+          this.#renderApp(aiTranslator)
+          this.#runningApps.push(aiTranslator)
+        }
+        if (appName === 'Buddy Chat') {
+          await import('../messages/messages.js')
 
-        const chatApp = { id: new Date().valueOf(), name: 'Buddy Chat' }
-        this.#renderApp(chatApp)
-        this.#runningApps.push(chatApp)
+          const chatApp = { id: new Date().valueOf(), name: 'Buddy Chat' }
+          this.#renderApp(chatApp)
+          this.#runningApps.push(chatApp)
+        }
+      } catch (error) {
+        console.error('Error loading app:', error)
       }
     }
 

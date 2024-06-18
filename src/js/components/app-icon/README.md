@@ -2,16 +2,25 @@
 
 This is a custom HTML component that represents an app icon. The component displays an image and the name of an app, and it can be interacted with to trigger an event.
 
+## Author
+
+Sabrina Prichard-Lybeck  
+Email: sp223kz@student.lnu.se  
+
+## Version
+
+1.1.0
+
 ## Table of Contents
 
-- [Features] (#features)
-- [Installation] (#installation)
-- [Usage] (#usage)
-- [Attributes] (#attributes)
-- [Events] (#events)
-- [Customization] (#customization)
-- [Contributing] (#contributing)
-- [License] (#license)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Attributes](#attributes)
+- [Events](#events)
+- [Customization](#customization)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
