@@ -93,6 +93,7 @@ customElements.define('memory-game',
     #memorycards
     #nicknameForm
     #playerName
+    #backOfCard
 
     /**
      * Constructor to invoke super class and attach component to shadow DOM.
@@ -151,9 +152,26 @@ customElements.define('memory-game',
       // Create an array with the amount of cards we need to create.
       for (let i = 1; i <= amountOfCards; i++) {
         // Push the image to the memory cards array twice so that each image has a matching pair.
-        this.#memorycards.push(`./images/kanji${i}.png`)
-        this.#memorycards.push(`./images/kanji${i}.png`)
+
+        const imagePath = this.#generatePath(`kanji${i}.png`)
+
+        this.#memorycards.push(imagePath)
+        this.#memorycards.push(imagePath)
       }
+    }
+
+    /**
+     * Method to generate the path to the module.
+     *
+     * @param {*} filename - The name of the file.
+     * @returns {string} The path to the module.
+     */
+    #generatePath (filename) {
+      // Get the path to the module (as shown in lectures).
+      const pathToModule = import.meta.url
+
+      // Set new path.
+      return new URL(`./images/${filename}`, pathToModule)
     }
 
     /**
@@ -176,11 +194,14 @@ customElements.define('memory-game',
       // Shuffle the images that will be rendered to the front of tiles.
       this.#shuffleImages()
 
+      // Set the path to the back of the card image.
+      this.#backOfCard = this.#generatePath('back-of-card.png')
+
       // Loop through columns and rows and create the amount of flipping tiles that the difficulty of the game requires.
       for (let i = 0; i < this.#columns * this.#rows; i++) {
         const flippingTile = document.createElement('flipping-tile')
         flippingTile.setAttribute('image-front', this.#memorycards[i])
-        flippingTile.setAttribute('image-back', './images/back-of-card.png')
+        flippingTile.setAttribute('image-back', this.#backOfCard)
 
         /* I want to listen to when a tile has been flipped so that I can invoke the method that is responsible for the game logic. */
         flippingTile.addEventListener('tile-is-flipped', (event) => {
@@ -220,7 +241,7 @@ customElements.define('memory-game',
           this.#previouslySelectedTile = null
 
           setTimeout(() => {
-            this.#gameOverCheck()
+            this.#gameOver()
           }, 1500)
         } else {
           // If the tiles do not match, flip the tiles back.
@@ -238,22 +259,24 @@ customElements.define('memory-game',
     }
 
     /**
-     * Method to check if all tiles are hidden, and if so, display a game over message to the user.
+     * Method to check if the game is over.
      */
-    #gameOverCheck () {
-      console.log('game over check')
+    #gameOver () {
+      console.log(this.#memoryGameBoard.querySelectorAll('flipping-tile'))
 
-      /*
-          console.log('game over')
-          this.#memoryGameBoard.innerHTML = ''
-          const gameOverMessage = document.createElement('p')
-          gameOverMessage.textContent = `Congratulations ${this.#playerName}! You found all matching pairs in ${this.#numOfTries} tries!`
-          this.#memoryGameBoard.append(gameOverMessage)
+      // Check if there are any tiles left on the board.
+      if (this.#memoryGameBoard.querySelectorAll('flipping-tile.is-hidden').length === this.#columns * this.#rows) {
+        // Clear the memory game board.
+        this.#memoryGameBoard.innerHTML = ''
 
-          // Append the high score component to the memory game board.
-          const highScore = document.createElement('high-score')
-          this.#memoryGameBoard.append(highScore)
-          */
+        // If there are no tiles left, present the user with a message that the game is over.
+        const gameOverMessage = document.createElement('div')
+        gameOverMessage.textContent = `Congratulations ${this.#playerName}! You finished the game in ${this.#numOfTries} tries!`
+        this.#memoryGameBoard.append(gameOverMessage)
+
+        // Reset the number of tries.
+        this.#numOfTries = 0
+      }
     }
 
     /**

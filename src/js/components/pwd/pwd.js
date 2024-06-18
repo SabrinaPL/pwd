@@ -21,6 +21,7 @@ template.innerHTML = `
       width: 100vw;
       height: 100vh;
       background-color: #C49BBB;
+      background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -96,12 +97,12 @@ customElements.define('personal-web-desktop',
       this.#desktopBackgrounds = []
 
       // Generate desktop background images.
-      for (let i = 0; i <= 6; i++) {
+      for (let i = 1; i <= 6; i++) {
         this.#desktopBackgrounds.push(`desktop-background${i}.jpg`)
       }
 
       // Set the desktop background image and change it on right click.
-      this.#pwd.style.backgroundImage = `url(${this.#generatePath(this.#desktopBackgrounds[0])})`
+      this.#pwd.style.backgroundImage = `url(${this.#generatePath(this.#desktopBackgrounds[Math.floor(Math.random() * this.#desktopBackgrounds.length)])})`
       this.#pwd.addEventListener('contextmenu', (event) => {
         event.preventDefault()
         this.#changeBackground()
@@ -185,7 +186,7 @@ customElements.define('personal-web-desktop',
      */
     #changeBackground () {
       // Set a new random background image.
-      const nextBackground = this.#desktopBackgrounds[Math.floor(Math.random() * this.#desktopBackgrounds.length + 1)]
+      const nextBackground = this.#desktopBackgrounds[Math.floor(Math.random() * this.#desktopBackgrounds.length)]
 
       // Set the new background image
       this.#pwd.style.backgroundImage = `url(${this.#generatePath(nextBackground)})`
@@ -298,5 +299,6 @@ customElements.define('personal-web-desktop',
       this.removeEventListener('open-app', (event) => this.#openSelectedApp(event.detail))
       this.removeEventListener('close-app', () => this.#closeSelectedApp())
       this.removeEventListener('move-window', (event) => this.#appOutOfBounds(event))
+      this.removeEventListener('contextmenu', (event) => this.#changeBackground(event))
     }
   })

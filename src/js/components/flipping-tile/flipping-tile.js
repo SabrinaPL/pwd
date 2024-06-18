@@ -184,6 +184,7 @@ customElements.define('flipping-tile',
      */
     hide () {
       this.shadowRoot.querySelector('.flipping-tile').classList.add('is-hidden')
+      this.classList.add('is-hidden')
     }
 
     /**

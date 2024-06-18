@@ -110,32 +110,35 @@ customElements.define('chat-app',
      */
     #submitMessage (event) {
       event.preventDefault()
+      try {
+        const message = this.#inputField.value
 
-      const message = this.#inputField.value
+        // Purify the input from potentially harmful html before sending it   to the server (to prevent XSS-attacks).
+        const cleanedMessage = DOMPurify.sanitize(message)
 
-      // Purify the input from potentially harmful html before sending it to the server (to prevent XSS-attacks).
-      const cleanedMessage = DOMPurify.sanitize(message)
+        // Prepare data to send to the server.
+        const data = {
+          type: 'message',
+          data: cleanedMessage,
+          username: this.#userName,
+          channel: 'my, not so secret, channel',
+          key: this.#KEY
+        }
 
-      // Prepare data to send to the server.
-      const data = {
-        type: 'message',
-        data: cleanedMessage,
-        username: this.#userName,
-        channel: 'my, not so secret, channel',
-        key: this.#KEY
+        // Send the message to the server.
+        this.#socket.send(JSON.stringify(data))
+
+        // Add username and message to messages array as objects.
+        this.#messages.push({ username: this.#userName, message: cleanedMessage })
+
+        // Update the messages in the chat window.
+        this.#updateMessages()
+
+        // Empty the input field.
+        this.#inputField.value = ''
+      } catch (error) {
+        throw new Error('There was an error sending the message: ' + error)
       }
-
-      // Send the message to the server.
-      this.#socket.send(JSON.stringify(data))
-
-      // Add username and message to messages array as objects.
-      this.#messages.push({ username: this.#userName, message: cleanedMessage })
-
-      // Update the messages in the chat window.
-      this.#updateMessages()
-
-      // Empty the input field.
-      this.#inputField.value = ''
     }
 
     /**
